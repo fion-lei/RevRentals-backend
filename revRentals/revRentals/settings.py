@@ -93,7 +93,7 @@ DATABASES = {
         "HOST": env('DB_HOST'),
         "PORT": "3306",
         "OPTIONS": {
-            "ssl": { "ca": "C:/Users/Peter/OneDrive/Desktop/RevRentals Backend/RevRentals-backend/revRentals/revRentals/DigiCertGlobalRootCA.crt.pem"}
+            "ssl": { "ca": "C:/Users/Kaylee/VSCode/RevRentals/RevRentals-backend/revRentals/revRentals/DigiCertGlobalRootCA.crt.pem"}
         }
     }
 }

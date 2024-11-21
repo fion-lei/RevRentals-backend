@@ -1,0 +1,23 @@
+# Ignore virtual environment
+venv/
+
+# Ignore compiled Python files
+*.pyc
+__pycache__/
+
+# Ignore SQLite database
+db.sqlite3
+
+# Ignore environment variables file
+.env
+
+# Ignore SSL certificates or sensitive files
+DigiCertGlobalRootCA.crt.pem
+
+# Ignore VSCode specific files
+.vscode/
+*.code-workspace
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db

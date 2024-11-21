@@ -7,7 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'revRentals.settings')
 django.setup()
 
 # Import your views and necessary utilities
-from myApp.views import add_profile_view, check_profile_view 
+from myApp.views import add_profile_view, check_profile_view
 from django.test import RequestFactory
 
 # Initialize the Django test request factory
@@ -21,11 +21,11 @@ def test_add_profile():
     request = factory.post(
         '/api/profile/add/',
         data=json.dumps({
-            "first_name": "John",
+            "first_name": "Jane",
             "last_name": "Doe",
-            "email": "john.doe@example.com",
+            "email": "jane.doe@example.com",
             "license": "AB12345",
-            "username": "TESTING_1",
+            "username": "TESTING_2",
             "password": "password123",
             "address": "123 Elm Street",
             "overall_rating": 4.5
@@ -39,7 +39,7 @@ def test_add_profile():
 # Test checking if a profile exists
 def test_check_profile():
     print("\nTesting check_profile_view...")
-    request = factory.get('/api/profile/check/?email=john.doe@example.com')
+    request = factory.get('/api/profile/check/?email=jane.doe@example.com')
     response = check_profile_view(request)
     print("Response:", response.content.decode())
 
