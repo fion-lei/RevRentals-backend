@@ -5,9 +5,6 @@ venv/
 *.pyc
 __pycache__/
 
-# Ignore SQLite database
-db.sqlite3
-
 # Ignore VSCode specific files
 .vscode/
 *.code-workspace
