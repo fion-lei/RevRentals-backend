@@ -8,8 +8,10 @@ django.setup()
 
 # Import your views and necessary utilities
 from myApp.profile_views import add_profile_view, check_profile_view, update_profile_view, update_address_view
-from myApp.vehicle_views import get_vehicles_view, search_by_engine_view, search_by_cargo_view, search_by_dirtbike_type_view, search_by_color_view, search_by_rental_price_view,search_by_mileage_view, search_by_multiple_conditions_view
-from myApp.gear_views import get_all_gear_view, search_gear_by_brand_view, search_gear_by_material_view, search_gear_by_type_view, search_gear_by_size_view, search_gear_by_rental_price_view, search_gear_by_multiple_conditions_view
+from myApp.vehicle_views import get_vehicles_view, search_by_engine_view, search_by_cargo_view, search_by_dirtbike_type_view, search_by_color_view, search_by_rental_price_view,search_by_mileage_view, search_by_multiple_conditions_view, insert_motorized_vehicle_view, update_vehicle_price_view
+from myApp.gear_views import get_all_gear_view, search_gear_by_brand_view, search_gear_by_material_view, search_gear_by_type_view, search_gear_by_size_view, search_gear_by_rental_price_view, search_gear_by_multiple_conditions_view, insert_gear_view
+from myApp.storage_lot_views import get_all_storage_lots_view, search_storage_lot_by_address_view, add_storage_lot_view
+from myApp.garage_views import view_all_garage_items_view
 from django.test import RequestFactory
 
 # Initialize the Django test request factory
@@ -257,25 +259,223 @@ def test_search_gear_by_multiple_conditions_view():
     response = search_gear_by_multiple_conditions_view(request)
     print("Response:", response.content.decode())
 
+def test_get_all_storage_lots_view():
+    print("\nTesting get_all_storage_lots_view...")
+    request = factory.get('/api/storage_lot/all', content_type='application/json')
+    response = get_all_storage_lots_view(request)
+    print("Response:", response.content.decode())
+
+def test_search_storage_lot_by_address_view():
+    print("\nTesting search_storage_lot_by_address_view...")
+    request = factory.post(
+        '/api/storage_lot/search/address',
+        data=json.dumps({"address": "123 Storage Lane"}),
+        content_type='application/json'
+    )
+    response = search_storage_lot_by_address_view(request)
+    print("Response:", response.content.decode())
+
+def test_add_storage_lot_view():
+    print("\nTesting add_storage_lot_view...")
+    request = factory.post(
+        '/api/storage_lot/add',
+        data=json.dumps({
+            "laddress": "789 New Calgary Ave",
+            "admin_id": 1001
+        }),
+        content_type='application/json'
+    )
+    response = add_storage_lot_view(request)
+    print("Response:", response.content.decode())
+    
+def test_insert_motorized_vehicle_view():
+    print("\nTesting insert_motorized_vehicle_view...")
+
+    # Test case for inserting a Motorcycle
+    request = factory.post(
+        '/api/motorized_vehicle/add',
+        data=json.dumps({
+            "vin": "VIN006",
+            "garage_id": 1,
+            "registration": "REG006",
+            "rental_price": 150.00,
+            "color": "Green",
+            "mileage": 5000,
+            "insurance": "Insurance1",
+            "model": "Kawasaki Ninja ZX-4R",
+            "vehicle_type": "motorcycle",
+            "engine_type": "Inline-4"
+        }),
+        content_type='application/json'
+    )
+    response = insert_motorized_vehicle_view(request)
+    print("Motorcycle Response:", response.content.decode())
+
+    # Test case for inserting a Moped
+    request = factory.post(
+        '/api/motorized_vehicle/add',
+        data=json.dumps({
+            "vin": "VIN007",
+            "garage_id": 2,
+            "registration": "REG007",
+            "rental_price": 120.00,
+            "color": "Red",
+            "mileage": 3000,
+            "insurance": "Basic",
+            "model": "Velocifero TENNIS 4000W",
+            "vehicle_type": "moped",
+            "cargo_rack": True
+        }),
+        content_type='application/json'
+    )
+    response = insert_motorized_vehicle_view(request)
+    print("Moped Response:", response.content.decode())
+
+    # Test case for inserting a Dirtbike
+    request = factory.post(
+        '/api/motorized_vehicle/add',
+        data=json.dumps({
+            "vin": "VIN008",
+            "garage_id": 3,
+            "registration": "REG008",
+            "rental_price": 180.00,
+            "color": "Blue",
+            "mileage": 2000,
+            "insurance": "Comprehensive",
+            "model": "Honda CRF250R",
+            "vehicle_type": "dirtbike",
+            "dirt_bike_type": "Trail"
+        }),
+        content_type='application/json'
+    )
+    response = insert_motorized_vehicle_view(request)
+    print("Dirtbike Response:", response.content.decode())
+
+    # Test case with missing required fields
+    request = factory.post(
+        '/api/motorized_vehicle/add',
+        data=json.dumps({
+            "vin": "VIN009",
+            "garage_id": 4,
+            "registration": "REG009",
+            "rental_price": 200.00,
+            "color": "Yellow",
+            "mileage": 1000,
+            "insurance": "Premium",
+            "model": "Unknown",
+            "vehicle_type": "motorcycle"
+            # Missing 'engine_type'
+        }),
+        content_type='application/json'
+    )
+    response = insert_motorized_vehicle_view(request)
+    print("Missing Engine Type Response:", response.content.decode())
+
+    # Test case for invalid vehicle type
+    request = factory.post(
+        '/api/motorized_vehicle/add',
+        data=json.dumps({
+            "vin": "VIN0010",
+            "garage_id": 5,
+            "registration": "REG010",
+            "rental_price": 250.00,
+            "color": "Black",
+            "mileage": 1500,
+            "insurance": "Insurance5",
+            "model": "Unknown",
+            "vehicle_type": "truck"  # Invalid type
+        }),
+        content_type='application/json'
+    )
+    response = insert_motorized_vehicle_view(request)
+    print("Invalid Vehicle Type Response:", response.content.decode())
+
+def test_insert_gear_view():
+    print("\nTesting insert_gear_view...")
+
+    # Test case with all fields
+    request = factory.post(
+        '/api/gear/add',
+        data=json.dumps({
+            "garage_id": 1,
+            "brand": "Revit",
+            "material": "Leather",
+            "type": "Jacket",
+            "size": "Medium",
+            "rental_price": 150.00,
+            "gear_name": "Racing Jacket"
+        }),
+        content_type='application/json'
+    )
+    response = insert_gear_view(request)
+    print("Response with Gear Name:", response.content.decode())
+
+def test_view_all_garage_items_view():
+    print("\nTesting view_all_garage_items_view...")
+
+    # Test case with a valid garage ID
+    request = factory.get(
+        '/api/garage/items',
+        data={'garage_id': 1},
+        content_type='application/json'
+    )
+    response = view_all_garage_items_view(request)
+    print("Valid Garage Response:", response.content.decode())
+
+def test_update_vehicle_price_view():
+    print("\nTesting update_vehicle_price_view...")
+
+    # Test case with valid data
+    request = factory.post(
+        '/api/motorized_vehicle/update_price',
+        data=json.dumps({
+            "profile_id": 1,
+            "vin": "VIN001",
+            "rental_price": 777.77
+        }),
+        content_type='application/json'
+    )
+    response = update_vehicle_price_view(request)
+    print("Valid Update Response:", response.content.decode())
+
+    # Test case with invalid Profile ID
+    request = factory.post(
+        '/api/motorized_vehicle/update_price',
+        data=json.dumps({
+            "profile_id": 999,  # Assuming this profile_id doesn't exist
+            "vin": "VIN001",
+            "rental_price": 777.77
+        }),
+        content_type='application/json'
+    )
+    response = update_vehicle_price_view(request)
+    print("Invalid Profile ID Response:", response.content.decode())
+
 
 # Run tests
 if __name__ == "__main__":
-    test_add_profile()
-    test_check_profile()
-    test_update_profile()
-    test_update_address()
-    test_get_vehicles_view()
-    test_search_by_engine_view()
-    test_search_by_cargo_view()
-    test_search_by_dirtbike_type_view()
-    test_search_by_color_view()
-    test_search_by_rental_price_view()
-    test_search_by_mileage_view()
-    test_search_by_multiple_conditions_view()
-    test_get_all_gear_view()
-    test_search_gear_by_brand_view()
-    test_search_gear_by_material_view()
-    test_search_gear_by_type_view()
-    test_search_gear_by_size_view()
-    test_search_gear_by_rental_price_view()
-    test_search_gear_by_multiple_conditions_view()
+    # test_add_profile()
+    # test_check_profile()
+    # test_update_profile()
+    # test_update_address()
+    # test_get_vehicles_view()
+    # test_search_by_engine_view()
+    # test_search_by_cargo_view()
+    # test_search_by_dirtbike_type_view()
+    # test_search_by_color_view()
+    # test_search_by_rental_price_view()
+    # test_search_by_mileage_view()
+    # test_search_by_multiple_conditions_view()
+    # test_get_all_gear_view()
+    # test_search_gear_by_brand_view()
+    # test_search_gear_by_material_view()
+    # test_search_gear_by_type_view()
+    # test_search_gear_by_size_view()
+    # test_search_gear_by_rental_price_view()
+    # test_search_gear_by_multiple_conditions_view()
+    # test_get_all_storage_lots_view()
+    # test_search_storage_lot_by_address_view()
+    # test_add_storage_lot_view()
+    # test_insert_motorized_vehicle_view()
+    test_insert_gear_view()
+    test_view_all_garage_items_view()

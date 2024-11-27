@@ -27,6 +27,7 @@ def get_vehicles_view(request):
                     "Mileage": row[5],
                     "Insurance": row[6],
                     "Model": row[7],
+                    "Vehicle_Type": row[8]
                 }
                 for row in rows
             ]
@@ -414,3 +415,104 @@ def search_by_multiple_conditions_view(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({"error": "Invalid HTTP method. Only POST is allowed."}, status=405)
+
+def insert_motorized_vehicle_view(request):
+    if request.method == "POST":
+        try:
+            # Parse user input
+            data = json.loads(request.body)
+            vin = data.get('vin')
+            garage_id = data.get('garage_id')
+            registration = data.get('registration')
+            rental_price = data.get('rental_price')
+            color = data.get('color')
+            mileage = data.get('mileage')
+            insurance = data.get('insurance')
+            model = data.get('model')
+            vehicle_type = data.get('vehicle_type')
+
+            # Validate required fields
+            if not all([vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type]):
+                return JsonResponse({'error': 'All fields, including vehicle_type, are required.'}, status=400)
+
+            # Insert into Motorized_Vehicle table
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO Motorized_Vehicle (VIN, Garage_ID, Registration, Rental_Price, Color, Mileage, Insurance, Model, Vehicle_Type)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    [vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type]
+                )
+
+                # Insert into the corresponding child table
+                if vehicle_type.lower() == 'motorcycle':
+                    engine_type = data.get('engine_type', None)
+                    cursor.execute(
+                        """
+                        INSERT INTO Motorcycle (VIN, Engine_Type)
+                        VALUES (%s, %s)
+                        """,
+                        [vin, engine_type]
+                    )
+                elif vehicle_type.lower() == 'moped':
+                    cargo_rack = data.get('cargo_rack', None)
+                    cursor.execute(
+                        """
+                        INSERT INTO Moped (VIN, Cargo_Rack)
+                        VALUES (%s, %s)
+                        """,
+                        [vin, cargo_rack]
+                    )
+                elif vehicle_type.lower() == 'dirtbike':
+                    dirt_bike_type = data.get('dirt_bike_type', None)
+                    cursor.execute(
+                        """
+                        INSERT INTO Dirtbike (VIN, Dirt_Bike_Type)
+                        VALUES (%s, %s)
+                        """,
+                        [vin, dirt_bike_type]
+                    )
+                else:
+                    return JsonResponse({'error': f"Invalid vehicle type: {vehicle_type}"}, status=400)
+
+            return JsonResponse({'message': f"{vehicle_type.capitalize()} added successfully."}, status=201)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
+
+# Update motorized vehicle price
+def update_vehicle_price_view(request):
+    if request.method == "POST":
+        try:
+            # Parse user input
+            data = json.loads(request.body)
+            profile_id = data.get('profile_id')
+            vin = data.get('vin')
+            new_rental_price = data.get('rental_price')
+
+            # Validate required fields
+            if not all([profile_id, vin, new_rental_price]):
+                return JsonResponse({'error': 'Profile ID, VIN, and Rental Price are required.'}, status=400)
+
+            # Update query for motorized vehicle price
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    UPDATE Motorized_Vehicle AS M
+                    JOIN Garage AS G ON M.Garage_ID = G.Garage_ID
+                    JOIN Has AS H ON H.Garage_ID = G.Garage_ID
+                    SET M.Rental_Price = %s
+                    WHERE H.Profile_ID = %s AND M.VIN = %s
+                    """,
+                    [new_rental_price, profile_id, vin]
+                )
+
+            return JsonResponse({'message': f"Vehicle with VIN {vin} price updated successfully to {new_rental_price}."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)

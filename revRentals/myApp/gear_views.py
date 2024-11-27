@@ -267,3 +267,37 @@ def search_gear_by_multiple_conditions_view(request):
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
+
+def insert_gear_view(request):
+    if request.method == "POST":
+        try:
+            # Parse user input
+            data = json.loads(request.body)
+            garage_id = data.get('garage_id')
+            brand = data.get('brand')
+            material = data.get('material')
+            gear_type = data.get('type')
+            size = data.get('size')
+            rental_price = data.get('rental_price')
+            gear_name = data.get('gear_name', None)  # Optional field with default None
+
+            # Validate required fields
+            if not all([garage_id, brand, material, gear_type, size, rental_price]):
+                return JsonResponse({'error': 'All fields except gear_name are required.'}, status=400)
+
+            # Insert into Gear table
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO Gear (Garage_ID, Brand, Material, Type, Size, GRentalPrice, Gear_Name)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    [garage_id, brand, material, gear_type, size, rental_price, gear_name]
+                )
+
+            return JsonResponse({'message': 'Gear added successfully.'}, status=201)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
