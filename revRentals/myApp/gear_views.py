@@ -301,3 +301,37 @@ def insert_gear_view(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
+
+def delete_gear_view(request):
+    if request.method == "POST":
+        try:
+            # Parse user input
+            data = json.loads(request.body)
+            profile_id = data.get('profile_id')
+
+            # Validate required fields
+            if not profile_id:
+                return JsonResponse({'error': 'Profile ID is required.'}, status=400)
+
+            # Delete query for gear
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    DELETE FROM Gear
+                    WHERE Product_No IN (
+                        SELECT GE.Product_No
+                        FROM Gear AS GE
+                        NATURAL JOIN Garage AS G
+                        JOIN Has AS H ON H.Garage_ID = G.Garage_ID
+                        WHERE H.Profile_ID = %s
+                    )
+                    """,
+                    [profile_id]
+                )
+
+            return JsonResponse({'message': f"Gear associated with Profile ID {profile_id} deleted successfully."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
