@@ -8,10 +8,11 @@ django.setup()
 
 # Import your views and necessary utilities
 from myApp.profile_views import add_profile_view, check_profile_view, update_profile_view, update_address_view
-from myApp.vehicle_views import get_vehicles_view, search_by_engine_view, search_by_cargo_view, search_by_dirtbike_type_view, search_by_color_view, search_by_rental_price_view,search_by_mileage_view, search_by_multiple_conditions_view, insert_motorized_vehicle_view, update_vehicle_price_view
-from myApp.gear_views import get_all_gear_view, search_gear_by_brand_view, search_gear_by_material_view, search_gear_by_type_view, search_gear_by_size_view, search_gear_by_rental_price_view, search_gear_by_multiple_conditions_view, insert_gear_view
-from myApp.storage_lot_views import get_all_storage_lots_view, search_storage_lot_by_address_view, add_storage_lot_view
+from myApp.vehicle_views import get_vehicles_view, delete_motorized_vehicle_view, search_by_engine_view, search_by_cargo_view, search_by_dirtbike_type_view, search_by_color_view, search_by_rental_price_view,search_by_mileage_view, search_by_multiple_conditions_view, insert_motorized_vehicle_view, update_vehicle_price_view
+from myApp.gear_views import get_all_gear_view, delete_gear_view, search_gear_by_brand_view, search_gear_by_material_view, search_gear_by_type_view, search_gear_by_size_view, search_gear_by_rental_price_view, search_gear_by_multiple_conditions_view, insert_gear_view
+from myApp.storage_lot_views import get_all_storage_lots_view, edit_storage_lot_view, search_storage_lot_by_address_view, add_storage_lot_view, delete_storage_lot_view
 from myApp.garage_views import view_all_garage_items_view
+from myApp.admin_views import view_all_agreements_view, view_all_reservations_view
 from django.test import RequestFactory
 
 # Initialize the Django test request factory
@@ -451,6 +452,98 @@ def test_update_vehicle_price_view():
     response = update_vehicle_price_view(request)
     print("Invalid Profile ID Response:", response.content.decode())
 
+def test_delete_motorized_vehicle_view():
+    print("\nTesting delete_motorized_vehicle_view...")
+
+    # Test case with valid data
+    request = factory.post(
+        '/api/motorized_vehicle/delete',
+        data=json.dumps({
+            "profile_id": 1,
+            "vin": "VIN123"
+        }),
+        content_type='application/json'
+    )
+    response = delete_motorized_vehicle_view(request)
+    print("Valid Delete Motorized Vehicle Response:", response.content.decode())
+
+
+def test_delete_gear_view():
+    print("\nTesting delete_gear_view...")
+
+    # Test case with valid data
+    request = factory.post(
+        '/api/gear/delete',
+        data=json.dumps({
+            "profile_id": 1
+        }),
+        content_type='application/json'
+    )
+    response = delete_gear_view(request)
+    print("Valid Delete Gear Response:", response.content.decode())
+
+def test_delete_storage_lot_view():
+    print("\nTesting delete_storage_lot_view...")
+
+    # Test case with valid data
+    request = factory.post(
+        '/api/storage_lot/delete',
+        data=json.dumps({
+            "lot_no": 1
+        }),
+        content_type='application/json'
+    )
+    response = delete_storage_lot_view(request)
+    print("Valid Delete Storage Lot Response:", response.content.decode())
+
+def test_view_all_reservations_view():
+    print("\nTesting view_all_reservations_view...")
+
+    # Test case to fetch all reservations
+    request = factory.get(
+        '/api/reservations/view',
+        content_type='application/json'
+    )
+    response = view_all_reservations_view(request)
+    print("Reservations Response:", response.content.decode())
+
+def test_view_all_agreements_view():
+    print("\nTesting view_all_agreements_view...")
+
+    # Test case to fetch all agreements
+    request = factory.get(
+        '/api/agreements/view',
+        content_type='application/json'
+    )
+    response = view_all_agreements_view(request)
+    print("Agreements Response:", response.content.decode())
+
+def test_edit_storage_lot_view():
+    print("\nTesting edit_storage_lot_view...")
+
+    # Test case with valid data
+    request = factory.post(
+        '/api/storage_lot/edit',
+        data=json.dumps({
+            "lot_no": 123,
+            "laddress": "Update Ave NW"
+        }),
+        content_type='application/json'
+    )
+    response = edit_storage_lot_view(request)
+    print("Valid Edit Storage Lot Response:", response.content.decode())
+
+    # Test case with missing lot number
+    request = factory.post(
+        '/api/storage_lot/edit',
+        data=json.dumps({
+            "laddress": "Update Ave NW"
+        }),
+        content_type='application/json'
+    )
+    response = edit_storage_lot_view(request)
+    print("Missing Lot_No Response:", response.content.decode())
+
 
 # Run tests
 if __name__ == "__main__":
@@ -479,3 +572,7 @@ if __name__ == "__main__":
     # test_insert_motorized_vehicle_view()
     test_insert_gear_view()
     test_view_all_garage_items_view()
+    test_update_vehicle_price_view()
+    test_delete_motorized_vehicle_view()
+    test_delete_gear_view()
+    test_delete_storage_lot_view()

@@ -87,3 +87,61 @@ def add_storage_lot_view(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({"error": "Invalid HTTP method. Only POST is allowed."}, status=405)
+
+def delete_storage_lot_view(request):
+    if request.method == "POST":
+        try:
+            # Parse user input
+            data = json.loads(request.body)
+            lot_no = data.get('lot_no')
+
+            # Validate required fields
+            if not lot_no:
+                return JsonResponse({'error': 'Lot number is required.'}, status=400)
+
+            # Delete query for storage lot
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    DELETE FROM Storage_Lot
+                    WHERE Lot_No = %s
+                    """,
+                    [lot_no]
+                )
+
+            return JsonResponse({'message': f"Storage lot with Lot_No {lot_no} deleted successfully."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
+
+def edit_storage_lot_view(request):
+    if request.method == "POST":
+        try:
+            # Parse user input
+            data = json.loads(request.body)
+            lot_no = data.get('lot_no')
+            new_address = data.get('laddress')
+
+            # Validate required fields
+            if not all([lot_no, new_address]):
+                return JsonResponse({'error': 'Lot number and new address are required.'}, status=400)
+
+            # Update query for storage lot
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    UPDATE Storage_Lot
+                    SET LAddress = %s
+                    WHERE Lot_No = %s
+                    """,
+                    [new_address, lot_no]
+                )
+
+            return JsonResponse({'message': f"Storage lot with Lot_No {lot_no} updated successfully to address {new_address}."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)

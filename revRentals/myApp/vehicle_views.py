@@ -516,3 +516,35 @@ def update_vehicle_price_view(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
+
+def delete_motorized_vehicle_view(request):
+    if request.method == "POST":
+        try:
+            # Parse user input
+            data = json.loads(request.body)
+            profile_id = data.get('profile_id')
+            vin = data.get('vin')
+
+            # Validate required fields
+            if not all([profile_id, vin]):
+                return JsonResponse({'error': 'Profile ID and VIN are required.'}, status=400)
+
+            # Delete query for motorized vehicle
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    DELETE M
+                    FROM Motorized_Vehicle AS M
+                    JOIN Garage AS G ON M.Garage_ID = G.Garage_ID
+                    JOIN Has AS H ON H.Garage_ID = G.Garage_ID
+                    WHERE H.Profile_ID = %s AND M.VIN = %s
+                    """,
+                    [profile_id, vin]
+                )
+
+            return JsonResponse({'message': f"Motorized vehicle with VIN {vin} deleted successfully."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
