@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import LoginView, RegisterView, GetGarageIDView
 from .garage_views import AddMotorizedVehicleView, ViewAllGarageItemsView, ViewAllMotorizedVehicles, ViewAllStorageLots, ViewAllGearItems
+from .admin_views import AdminLoginView
 
 urlpatterns = [
     path('api/login/', LoginView.as_view(), name='login'),
@@ -11,4 +12,7 @@ urlpatterns = [
     path('api/motorized-vehicles/', ViewAllMotorizedVehicles.as_view(), name='view-all-motorized-vehicles'),
     path('api/storage-lots/', ViewAllStorageLots.as_view(), name='view-all-storage-lots'),
     path('api/gear-items/', ViewAllGearItems.as_view(), name='view-all-gear-items'),
+
+    # Admin URLs
+    path('api/admin-login/',AdminLoginView.as_view(), name='admin-login')
 ]
