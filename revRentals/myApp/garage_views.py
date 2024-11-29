@@ -79,6 +79,10 @@ class AddMotorizedVehicleView(APIView):
             # Handle any errors and return an appropriate response
             print("Error occurred:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# TODO: Add gear
+class AddGearView(APIView):
+    print()
 
 class ViewAllMotorizedVehicles(APIView):
     def get(self, request):
