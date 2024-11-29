@@ -135,3 +135,95 @@ class GetGarageIDView(APIView):
                 return Response({"error": "Garage not found for this profile."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class GetProfileIDView(APIView):
+    def get(self, request, username):
+        try:
+            # Query to fetch profile_id using the username
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT Profile_ID
+                    FROM profile
+                    WHERE Username = %s
+                """, [username])
+                result = cursor.fetchone()
+
+            if result:
+                profile_id = result[0]
+                return Response({
+                    "success": True,
+                    "profile_id": profile_id
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Profile not found for this username."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ProfileDetailsView(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            profile_id = data.get('profile_id')
+            
+            print(f"Received profile_id: {profile_id}, type: {type(profile_id)}")
+            
+            # Convert profile_id to int if it's a string
+            if isinstance(profile_id, str):
+                profile_id = int(profile_id)
+
+            first_name = data.get('first_name')
+            last_name = data.get('last_name')
+            license_number = data.get('license_number')
+            address = data.get('address')
+
+            with connection.cursor() as cursor:
+                # First verify profile exists
+                cursor.execute("SELECT COUNT(*) FROM profile WHERE Profile_ID = %s", [profile_id])
+                exists = cursor.fetchone()[0]
+                
+                print(f"Profile exists: {exists}")
+                
+                if not exists:
+                    return Response({
+                        "success": False,
+                        "error": f"Profile {profile_id} not found"
+                    }, status=status.HTTP_404_NOT_FOUND)
+
+                # Update profile
+                cursor.execute("""
+                    UPDATE profile 
+                    SET First_Name = %s, Last_Name = %s, License = %s, Address = %s
+                    WHERE Profile_ID = %s
+                """, [first_name, last_name, license_number, address, profile_id])
+
+                # Fetch updated data
+                cursor.execute("""
+                    SELECT Profile_ID, Username, First_Name, Last_Name, Email, License, Address, OverallRating
+                    FROM profile 
+                    WHERE Profile_ID = %s
+                """, [profile_id])
+                user = cursor.fetchone()
+                
+                print(f"Fetched user data: {user}")
+
+                if user:
+                    return Response({
+                        "success": True,
+                        "user": {
+                            "profile_id": user[0],
+                            "username": user[1],
+                            "first_name": user[2],
+                            "last_name": user[3],
+                            "email": user[4],
+                            "license": user[5],
+                            "address": user[6],
+                            "overall_rating": float(user[7]) if user[7] else None
+                        }
+                    }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Error in ProfileDetailsView: {str(e)}")
+            return Response({
+                "success": False,
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
