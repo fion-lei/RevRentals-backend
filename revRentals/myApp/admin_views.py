@@ -2,8 +2,47 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db import connection
 import json
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from django.contrib.auth.hashers import check_password
 
 # Create your views here.
+class AdminLoginView(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            username = data.get("username")
+            password = data.get("password")
+            print(username)
+            print(password)
+
+            # Query the database for admin username
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT Admin_Name, Admin_Password
+                    FROM admin
+                    WHERE Admin_Name = %s
+                    """, [username]) 
+                admin = cursor.fetchone()
+                
+            if admin:
+                admin_name, admin_password = admin
+                if password == admin_password:
+                    return Response({
+                        "success": True,
+                        "message": "Login successful",
+                        "admin": {
+                            "admin_name": admin_name
+                        }
+                    }, status = status.HTTP_200_OK)
+                else:
+                    return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                    return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)                
 
 # View all reservations
 def view_all_reservations_view(request):
