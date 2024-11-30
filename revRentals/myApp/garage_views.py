@@ -250,3 +250,57 @@ class ViewAllGearItems(APIView):
             return Response({"gear_items": gear_items_data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class ViewMaintenanceRecords(APIView):
+    def get(self,request, vin):
+        try:
+            print(vin)
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                               SELECT Date, Serviced_By, Service_Details
+                               FROM maintenance_record
+                               WHERE VIN = %s
+                               """,[vin])
+                maint_records = cursor.fetchall()
+                if maint_records:
+                    maint_records_data = [
+                        {
+                        "date": row[0],
+                        "serviced_by": row[1],
+                        "service_details": row[2]
+                        } for row in maint_records
+                    ]
+                    return Response({"maintenance_records":maint_records_data}, status = status.HTTP_200_OK)
+                else:
+                    return Response({"error": "No maintenance records found for this vehicle."}, status=status.HTTP_404_NOT_FOUND)                
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class AddMaintenanceRecordsView(APIView):
+    def post(self,request):
+        try:
+            data = request.data
+            vin = data.get("vin")
+            date = data.get("date")
+            serviced_by = data.get("serviced_by")
+            service_details = data.get("service_details")
+            print("VIN", vin)
+            print("date", date)
+            print("serviced by", serviced_by)
+            print("service details", service_details)
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO maintenance_record(VIN, DATE, SERVICED_BY, SERVICE_DETAILS)
+                    VALUES (%s, %s, %s, %s)
+                               """
+                               ,[vin, date, serviced_by, service_details])
+            print("Maintenance records added")
+            return Response(
+                        {"success": True, "message": "Maintenance records added successfully."},
+                        status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            # Handle any errors and return an appropriate response
+            print("Error occurred trying to add maintenance records:", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
