@@ -2,6 +2,7 @@ from django.db import connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
@@ -278,23 +279,23 @@ class ViewMaintenanceRecords(APIView):
         
         
 class AddMaintenanceRecordsView(APIView):
-    def post(self,request):
+    
+    def post(self, request):
         try:
             data = request.data
-            vin = data.get("vin")
-            date = data.get("date")
-            serviced_by = data.get("serviced_by")
-            service_details = data.get("service_details")
-            print("VIN", vin)
-            print("date", date)
-            print("serviced by", serviced_by)
-            print("service details", service_details)
+            if not data:
+                return Response(
+                    {"error": "No maintenance records provided."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             with connection.cursor() as cursor:
-                cursor.execute("""
+                cursor.executemany("""
                     INSERT INTO maintenance_record(VIN, DATE, SERVICED_BY, SERVICE_DETAILS)
                     VALUES (%s, %s, %s, %s)
                                """
-                               ,[vin, date, serviced_by, service_details])
+                               ,[(record.get["vin"], record.get["date"], record.get["serviced_by"], record.get["service_details"])    
+                                for record in data]
+                )
             print("Maintenance records added")
             return Response(
                         {"success": True, "message": "Maintenance records added successfully."},
