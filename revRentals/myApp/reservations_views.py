@@ -46,3 +46,12 @@ class AddAgreementView(APIView):
 # TODO: Add transaction
 class AddTransactionView(APIView):
     print()
+
+# TODO: Get transaction via reservation_no
+class GetTransactionView(APIView):
+    print()
+
+# TODO: Get agreement via reservation_no
+
+class GetAgreementView(APIView):
+    print()

@@ -42,6 +42,9 @@ urlpatterns = [
     # Agreements, Reservations, Transactions
     path('api/agreements/', ViewAllAgreements.as_view(), name ='view-agreements'),
     path('api/reservations/', ViewAllReservations.as_view(), name ='view-reservations'),
+    path('api/view-transaction/<int:reservation_no>/', GetTransactionView.as_view(), name = 'view-transaction' ),
+    path('api/view-agreement/<int:reservation_no>/', GetAgreementView.as_view(), name = 'view-agreement' ),
+    
     # Lots
     path('api/add-lot-listing/',AddLotListing.as_view(), name = 'add-lot-listing'),
     path('api/edit-lot-listing/',EditLotListing.as_view(), name = 'edit-lot-listing'),
