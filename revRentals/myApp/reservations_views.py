@@ -9,15 +9,20 @@ class AddMotorcycleReservationView(APIView):
         try:
             data = request.data
             profile_id = data.get("profile_id")
-            admin_id = data.get("admin_id")
+            vin = data.get("vin")
             start_date = data.get("start_date")
             end_date = data.get("end_date")
-            vin = data.get("vin")
             status = "Pending Approval"
+            print(profile_id)
             with connection.cursor() as cursor:
+                cursor.execute("SELECT admin_id FROM admin LIMIT 1")  # Assumes there's only one admin
+                admin_id = cursor.fetchone()[0]  # Fetch the first (and only) admin ID
+            
                 cursor.execute("""
                                INSERT INTO reservation(Profile_ID, Admin_ID, VIN, Start_Date, End_Date, Status)
-                               """, [profile_id, admin_id,vin, start_date, end_date, status])
+                               VALUES(%s,%s,%s,%s,%s,%s)
+                               """, [profile_id, admin_id, vin, start_date, end_date, status])
+            
             print("reservation was added")   
             return Response({"success": True, "message": "Reservation added successfully."}, status=status.HTTP_201_CREATED)
         except Exception as e:

@@ -48,14 +48,17 @@ class AdminLoginView(APIView):
 class GetAdminIDView(APIView):
     def get(self, request):
         try:
+            data = request.data
+            print(data)
             with connection.cursor as cursor:
                 cursor.execute("""
                                 SELECT Admin_ID
                                 FROM admin
                                 """
                                 )
-                admin_id = cursor.fetchone()
-                return Response({"admin_id":admin_id}, status=status.HTTP_200_OK)
+            admin_id = cursor.fetchone()
+            print(admin_id)
+            return Response({"success":True, "admin_id":admin_id}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
