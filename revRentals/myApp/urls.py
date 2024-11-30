@@ -34,7 +34,7 @@ urlpatterns = [
     path('api/add-listing/', AddMotorizedVehicleView.as_view(), name='add-listing'),
     path('api/add-gear-listing/', AddGearView.as_view(), name = 'add-gear'),
     path('api/view-listing/', ViewAllGarageItemsView.as_view(), name='view-listing'),
-    path('api/add-maintenance-records/', AddMaintenanceRecordsView.as_view, name='add-maintenance-records'),
+    path('api/add-maintenance-records/', AddMaintenanceRecordsView.as_view(), name='add-maintenance-records'),
     
     # Admin URLs
     path('api/admin-login/', AdminLoginView.as_view(), name='admin-login'),

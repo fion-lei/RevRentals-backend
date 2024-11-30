@@ -279,7 +279,6 @@ class ViewMaintenanceRecords(APIView):
         
         
 class AddMaintenanceRecordsView(APIView):
-    
     def post(self, request):
         try:
             data = request.data
@@ -293,9 +292,10 @@ class AddMaintenanceRecordsView(APIView):
                     INSERT INTO maintenance_record(VIN, DATE, SERVICED_BY, SERVICE_DETAILS)
                     VALUES (%s, %s, %s, %s)
                                """
-                               ,[(record.get["vin"], record.get["date"], record.get["serviced_by"], record.get["service_details"])    
-                                for record in data]
-                )
+                               ,[
+                    (record.get("vin"), record.get("date"), record.get("serviced_by"), record.get("service_details"))
+                    for record in data
+                ])
             print("Maintenance records added")
             return Response(
                         {"success": True, "message": "Maintenance records added successfully."},
