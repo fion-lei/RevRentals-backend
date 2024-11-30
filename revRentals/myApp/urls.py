@@ -15,9 +15,8 @@ urlpatterns = [
     
     # Marketplace
     path('api/motorized-vehicles/', ViewAllMotorizedVehicles.as_view(), name='view-all-motorized-vehicles'),
-    
-    # path('api/get-vin/<str:model>/<int:>',GetVIN.as_view(),name = 'get-vin'),
-    
+    path('api/motorized-vehicles/<str:vin>/',ViewMaintenanceRecords.as_view(), name = 'view-maintenance-records'),
+        
     path('api/storage-lots/', ViewAllStorageLots.as_view(), name='view-all-storage-lots'),
     path('api/gear-items/', ViewAllGearItems.as_view(), name='view-all-gear-items'),
     
@@ -35,7 +34,8 @@ urlpatterns = [
     path('api/add-listing/', AddMotorizedVehicleView.as_view(), name='add-listing'),
     path('api/add-gear-listing/', AddGearView.as_view(), name = 'add-gear'),
     path('api/view-listing/', ViewAllGarageItemsView.as_view(), name='view-listing'),
-
+    path('api/add-maintenance-records', AddMaintenanceRecordsView.as_view, name='add-maintenance-records'),
+    
     # Admin URLs
     path('api/admin-login/', AdminLoginView.as_view(), name='admin-login'),
     path('api/get-admin-id/', GetAdminIDView.as_view(), name='get-admin-id'),
