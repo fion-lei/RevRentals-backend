@@ -3,6 +3,7 @@ from .views import *
 from .garage_views import *
 from .admin_views import *
 from .reservations_views import *
+from .vehicle_views import GetVIN
 
 urlpatterns = [
     # User URLs
@@ -14,6 +15,9 @@ urlpatterns = [
     
     # Marketplace
     path('api/motorized-vehicles/', ViewAllMotorizedVehicles.as_view(), name='view-all-motorized-vehicles'),
+    
+    # path('api/get-vin/<str:model>/<int:>',GetVIN.as_view(),name = 'get-vin'),
+    
     path('api/storage-lots/', ViewAllStorageLots.as_view(), name='view-all-storage-lots'),
     path('api/gear-items/', ViewAllGearItems.as_view(), name='view-all-gear-items'),
     
@@ -23,8 +27,10 @@ urlpatterns = [
     path('api/lot-reservation/', AddLotReservationView.as_view(), name='add-lot-reservation'), 
     
     # Agreements
+    path('api/add-agreement/', AddAgreementView.as_view(), name='add-agreement'),     
     
     # Transactions
+    path('api/add-transaction/', AddTransactionView.as_view(), name='add-transaction'),  
     
     # Garage
     path('api/get-garage-id/<int:profile_id>/', GetGarageIDView.as_view(), name='get_garage_id'),
@@ -36,6 +42,7 @@ urlpatterns = [
 
     # Admin URLs
     path('api/admin-login/',AdminLoginView.as_view(), name='admin-login'),
+    path('api/get-admin-id/<str:username>/',GetAdminIDView.as_view(), name='get-admin-id'),
     # Agreements, Reservations, Transactions
     path('api/agreements/', ViewAllAgreements.as_view(), name ='view-agreements'),
     path('api/reservations/', ViewAllReservations.as_view(), name ='view-reservations'),
