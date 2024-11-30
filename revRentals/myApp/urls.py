@@ -22,9 +22,8 @@ urlpatterns = [
     path('api/gear-items/', ViewAllGearItems.as_view(), name='view-all-gear-items'),
     
     # Reservations for items
-    path('api/motorcycle-reservation/', AddMotorcycleReservationView.as_view(), name='add-motorcycle-reservation'),
-    path('api/gear-reservation/', AddGearReservationView.as_view(), name='add-gear-reservation'), 
-    path('api/lot-reservation/', AddLotReservationView.as_view(), name='add-lot-reservation'), 
+    path('api/add-reservation/', AddReservationView.as_view(), name='add-reservation'),
+
     
     # Agreements
     path('api/add-agreement/', AddAgreementView.as_view(), name='add-agreement'),     
