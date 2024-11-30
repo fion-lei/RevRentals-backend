@@ -82,8 +82,24 @@ class AddMotorizedVehicleView(APIView):
         
 # TODO: Add gear
 class AddGearView(APIView):
-    print()
-
+    def post(self, request):
+        try:
+            data = request.data
+            garage_id = data.get("garage_id")
+            brand = data.get("brand")
+            material = data.get("material")
+            type = data.get("type")
+            size = data.get("size")
+            rental_price = data.get("rental_price")
+            gear_name = data.get("gear_name")
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO gear(Garage_ID, Brand, Material, Type, Size, GRentalPrice, Gear_Name) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                               """, [garage_id, brand, material, type, size, rental_price, gear_name])
+            return Response({"success": True, "message": "Gear added successfully."}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ViewAllMotorizedVehicles(APIView):
     def get(self, request):

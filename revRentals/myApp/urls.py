@@ -23,7 +23,6 @@ urlpatterns = [
     
     # Reservations for items
     path('api/add-reservation/', AddReservationView.as_view(), name='add-reservation'),
-
     
     # Agreements
     path('api/add-agreement/', AddAgreementView.as_view(), name='add-agreement'),     
@@ -34,10 +33,8 @@ urlpatterns = [
     # Garage
     path('api/get-garage-id/<int:profile_id>/', GetGarageIDView.as_view(), name='get_garage_id'),
     path('api/add-listing/', AddMotorizedVehicleView.as_view(), name='add-listing'),
-    # TODO: Add gear
     path('api/add-gear-listing/', AddGearView.as_view(), name = 'add-gear'),
     path('api/view-listing/', ViewAllGarageItemsView.as_view(), name='view-listing'),
-
 
     # Admin URLs
     path('api/admin-login/', AdminLoginView.as_view(), name='admin-login'),
