@@ -84,6 +84,7 @@ class AddMotorizedVehicleView(APIView):
 class AddGearView(APIView):
     print()
 
+
 class ViewAllMotorizedVehicles(APIView):
     def get(self, request):
         try:

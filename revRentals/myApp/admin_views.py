@@ -42,9 +42,24 @@ class AdminLoginView(APIView):
             else:
                     return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)                
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)     
+                   
+# TODO: Get admin id
+class GetAdminIDView(APIView):
+    def get(self, request):
+        try:
+            with connection.cursor as cursor:
+                cursor.execute("""
+                                SELECT Admin_ID
+                                FROM admin
+                                """
+                                )
+                admin_id = cursor.fetchone()
+                return Response({"admin_id":admin_id}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
+    
 class ViewAllReservations(APIView):
     # View all reservations
     def get(self, request):

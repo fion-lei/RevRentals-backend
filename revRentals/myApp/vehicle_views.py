@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db import connection
 import json
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 # Create your views here.
 
@@ -548,3 +551,20 @@ def delete_motorized_vehicle_view(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
+
+class GetVIN(APIView):
+    def get(self, request):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT VIN
+                    FROM motorized_vehicle
+                    WHERE model = %s AND rental_price = %s
+                    """)
+                vin = cursor.fetchone()
+                
+            return Response({"vin": vin} , status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)  
+    
+    
