@@ -4,6 +4,7 @@ from .garage_views import *
 from .admin_views import *
 from .reservations_views import *
 from .vehicle_views import GetVIN
+from .notifications_views import *
 
 urlpatterns = [
     # User URLs
@@ -23,11 +24,12 @@ urlpatterns = [
     # Reservations for items
     path('api/add-reservation/', AddReservationView.as_view(), name='add-reservation'),
     
-    # Agreements
-    path('api/add-agreement/', AddAgreementView.as_view(), name='add-agreement'),     
-    
-    # Transactions
-    path('api/add-transaction/', AddTransactionView.as_view(), name='add-transaction'),  
+    # Agreements and Transactions
+    path('api/add-agreement/', AddAgreementView.as_view(), name='add-agreement'),
+    path('api/add-transaction/', AddTransactionView.as_view(), name='add-transaction'),
+    path('api/get-agreement/<int:reservation_no>/', GetAgreementView.as_view(), name='get-agreement'),
+    path('api/get-transaction/<int:reservation_no>/', GetTransactionView.as_view(), name='get-transaction'),
+    path('api/view-reservation-details/<int:reservation_no>/', ViewReservationDetails.as_view(), name='view-reservation-details'),
     
     # Garage
     path('api/get-garage-id/<int:profile_id>/', GetGarageIDView.as_view(), name='get_garage_id'),
