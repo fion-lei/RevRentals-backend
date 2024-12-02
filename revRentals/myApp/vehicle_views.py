@@ -5,6 +5,8 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Create your views here.
 
@@ -64,21 +66,21 @@ def search_by_engine_view(request):
 
             # if you want to see all details
             # # Convert rows to a list of dictionaries
-            # motorcycles = [
-            #     {
-            #         "VIN": row[0],
-            #         "Garage_ID": row[1],
-            #         "Registration": row[2],
-            #         "Rental_Price": row[3],
-            #         "Color": row[4],
-            #         "Mileage": row[5],
-            #         "Insurance": row[6],
-            #         "Model": row[7],
-            #         "Engine_Type": row[8]
-            #     }
-            #     for row in rows
-            # ]
-            # return JsonResponse({"motorcycles": motorcycles}, status=201)
+            motorcycles = [
+                 {
+                     "VIN": row[0],
+                     "Garage_ID": row[1],
+                     "Registration": row[2],
+                     "Rental_Price": row[3],
+                     "Color": row[4],
+                     "Mileage": row[5],
+                     "Insurance": row[6],
+                     "Model": row[7],
+                     "Engine_Type": row[8]
+                 }
+                 for row in rows
+             ]
+            return JsonResponse({"motorcycles": motorcycles}, status=201)
             
             # Extract VINs from rows
             vins = [row[0] for row in rows]
@@ -182,8 +184,10 @@ def search_by_dirtbike_type_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search for motorized vehicles by color
+@csrf_exempt
 def search_by_color_view(request):
     if request.method == "POST":
+        print("Received POST request")
         try:
             data = json.loads(request.body)
             color = data.get('color')
@@ -203,19 +207,19 @@ def search_by_color_view(request):
                 rows = cursor.fetchall()
 
             # if you want to see all details
-            # vehicles = [
-            #     {
-            #         "VIN": row[0],
-            #         "Garage_ID": row[1],
-            #         "Registration": row[2],
-            #         "Rental_Price": row[3],
-            #         "Color": row[4],
-            #         "Mileage": row[5],
-            #         "Insurance": row[6],
-            #         "Model": row[7]
-            #     }
-            #     for row in rows
-            # ]
+            """ vehicles = [
+                 {
+                     "VIN": row[0],
+                     "Garage_ID": row[1],
+                     "Registration": row[2],
+                     "Rental_Price": row[3],
+                     "Color": row[4],
+                     "Mileage": row[5],
+                     "Insurance": row[6],
+                     "Model": row[7]
+                 }
+                 for row in rows
+             ]"""
             # return JsonResponse({"vehicles": vehicles}, status=201)
             
             # Extract VINs from rows
@@ -224,6 +228,7 @@ def search_by_color_view(request):
             return JsonResponse({"vins": vins}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
+
 
 # Search for motorized vehicles by rental price
 def search_by_rental_price_view(request):
@@ -552,6 +557,34 @@ def delete_motorized_vehicle_view(request):
     else:
         return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
 
+class SearchByColorView(APIView):
+    # Search for motorized vehicles by color
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            color = data.get('color')
+
+            if not color:
+                return JsonResponse({'error': 'Color is required.'}, status=400)
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT *
+                    FROM motorized_vehicle
+                    WHERE color = %s
+                    """,
+                    [color]
+                )
+                rows = cursor.fetchall()
+
+            vins = [row[0] for row in rows]
+
+            return JsonResponse({"vins": vins}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+        
 class GetVIN(APIView):
     def get(self, request):
         try:
@@ -566,5 +599,4 @@ class GetVIN(APIView):
             return Response({"vin": vin} , status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)  
-    
     

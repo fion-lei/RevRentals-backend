@@ -47,9 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'myApp',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,6 +62,16 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'revRentals.urls'
+
+CORS_ALLOW_ALL_ORIGINS = True 
+
+CORS_ORIGIN_WHITELIST = ('localhost:8080')
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",  # For local development (React, Angular, etc.)
+    "http://localhost:8080",    # Add your production domain here
+]
+
 
 TEMPLATES = [
     {
@@ -94,7 +106,7 @@ DATABASES = {
         "HOST": env('DB_HOST'),
         "PORT": "3306",
         "OPTIONS": {
-            "ssl": { "ca": "C:/Users/Kaylee/VSCode/RevRentals/RevRentals-backend/revRentals/revRentals/DigiCertGlobalRootCA.crt.pem"}
+            "ssl": { "ca": "C:/Users/maroc/OneDrive/Desktop/rev/RevRentals-backend/revRentals/revRentals/DigiCertGlobalRootCA.crt.pem"}
         }
     }
 }

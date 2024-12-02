@@ -4,6 +4,13 @@ from .garage_views import *
 from .admin_views import *
 from .reservations_views import *
 from .vehicle_views import GetVIN
+from myApp.vehicle_views import search_by_color_view
+from myApp.vehicle_views import SearchByColorView
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 urlpatterns = [
     # User URLs
@@ -49,4 +56,8 @@ urlpatterns = [
     path('api/add-lot-listing/',AddLotListing.as_view(), name = 'add-lot-listing'),
     path('api/edit-lot-listing/',EditLotListing.as_view(), name = 'edit-lot-listing'),
 
+    # Marketplace
+    path('filter-by-color-view/',SearchByColorView.as_view(), name='filter_by_color_view'),
+    # path('api/filter/', filter_vehicles_view, name='filter_vehicles'),
+    path('filter-by-color/', search_by_color_view, name='filter_by_color'),
 ]
