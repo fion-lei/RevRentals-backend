@@ -13,28 +13,89 @@ class AddReservationView(APIView):
             vin = data.get("vin")
             start_date = data.get("start_date")
             end_date = data.get("end_date")
+
             print("VIN", vin)
             print("Lot_no", lot_no)
             print("Product_no", product_no)
+
             with connection.cursor() as cursor:
-                cursor.execute("SELECT admin_id FROM admin LIMIT 1")  # Assumes there's only one admin
-                admin_id = cursor.fetchone()[0]  # Fetch the first (and only) admin ID
-                if ((vin or lot_no or product_no)== None):
-                    return Response({"Error": "Missing one of three parameters (VIN, Lot_No, Product_No)"},status=status.HTTP_400_BAD_REQUEST)
-                else:
+                # Fetch the Admin ID (assuming there's only one admin)
+                cursor.execute("SELECT admin_id FROM admin LIMIT 1")
+                admin_id = cursor.fetchone()[0]
+
+                # Validate that one of VIN, Lot_No, or Product_No is provided
+                if not any([vin, lot_no, product_no]):
+                    return Response({"Error": "Missing one of three parameters (VIN, Lot_No, Product_No)"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                # Initialize seller_id to None
+                seller_id = None
+
+                # Retrieve Seller_ID based on the input type
+                if vin:
+                    # Fetch the Seller_ID using VIN from the MOTOR_VEHICLE and GARAGE tables
                     cursor.execute("""
-                                INSERT INTO reservation(Profile_ID, Admin_ID, Product_no, VIN, Lot_No, Start_Date, End_Date, Status)
-                                VALUES(%s,%s,%s,%s,%s,%s,%s,%s)
-                                """, [profile_id, admin_id, product_no, vin, lot_no, start_date, end_date, "Pending Approval"])
-                    print("Reservation added.")
-                    return Response(
-                        {"success": True, "message": "Reservation added successfully."},
-                        status=status.HTTP_201_CREATED
-                    )
+                        SELECT p.Profile_ID
+                        FROM motorized_vehicle mv
+                        INNER JOIN garage g ON mv.Garage_ID = g.Garage_ID
+                        INNER JOIN has h ON g.Garage_ID = h.Garage_ID
+                        INNER JOIN profile p ON h.Profile_ID = p.Profile_ID
+                        WHERE mv.VIN = %s
+                    """, [vin])
+                    result = cursor.fetchone()
+                    if result:
+                        seller_id = result[0]
+
+                elif product_no:
+                    # Fetch the Seller_ID using Product_No from the GEAR and GARAGE tables
+                    cursor.execute("""
+                        SELECT p.Profile_ID
+                        FROM gear g
+                        INNER JOIN garage gr ON g.Garage_ID = gr.Garage_ID
+                        INNER JOIN has h ON gr.Garage_ID = h.Garage_ID
+                        INNER JOIN profile p ON h.Profile_ID = p.Profile_ID
+                        WHERE g.Product_No = %s
+                    """, [product_no])
+                    result = cursor.fetchone()
+                    if result:
+                        seller_id = result[0]
+
+                elif lot_no:
+                    # Fetch the Seller_ID using Lot_No from the STORAGE_LOT and GARAGE tables
+                    cursor.execute("""
+                        SELECT p.Profile_ID
+                        FROM storage_lot sl
+                        INNER JOIN admin a ON sl.Admin_ID = a.Admin_ID
+                        INNER JOIN garage g ON g.Admin_ID = a.Admin_ID
+                        INNER JOIN has h ON g.Garage_ID = h.Garage_ID
+                        INNER JOIN profile p ON h.Profile_ID = p.Profile_ID
+                        WHERE sl.Lot_No = %s
+                    """, [lot_no])
+                    result = cursor.fetchone()
+                    if result:
+                        seller_id = result[0]
+
+                print(seller_id)
+                # If seller_id is not found, return an error
+                if not seller_id:
+                    return Response({"Error": "Could not find the Seller_ID for the provided VIN, Product_No, or Lot_No."},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                # Insert the reservation with the correct Seller_ID
+                cursor.execute("""
+                    INSERT INTO reservation(Profile_ID, Admin_ID, Product_no, VIN, Lot_No, Start_Date, End_Date, Status, Seller_ID)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, [profile_id, admin_id, product_no, vin, lot_no, start_date, end_date, "Pending Approval", seller_id])
+
+                print("Reservation added.")
+                return Response(
+                    {"success": True, "message": "Reservation added successfully."},
+                    status=status.HTTP_201_CREATED
+                )
 
         except Exception as e:
             # Handle any errors and return an appropriate response
-            print("Error occurred trying to add a reservation:", str(e))
+            print("Error occurred:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # TODO: Get agreement via reservation_no

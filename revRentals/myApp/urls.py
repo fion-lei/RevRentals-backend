@@ -51,4 +51,9 @@ urlpatterns = [
     path('api/add-lot-listing/',AddLotListing.as_view(), name = 'add-lot-listing'),
     path('api/edit-lot-listing/',EditLotListing.as_view(), name = 'edit-lot-listing'),
 
+    # notifications / reservations
+    path('api/notifications/seller/<int:seller_id>/', SellerNotificationsView.as_view(), name='seller-notifications'),
+    path('api/notifications/buyer/<int:buyer_id>/', BuyerNotificationsView.as_view(), name='buyer-notifications'),
+    path('api/reservations/<int:reservation_no>/', UpdateReservationView.as_view(), name='update-reservation'),
+    path('api/notifications/delete/<int:reservation_no>/', DeleteReservationView.as_view(), name='delete-reservation'),
 ]
