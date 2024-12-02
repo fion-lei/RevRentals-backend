@@ -60,5 +60,5 @@ urlpatterns = [
     path('filter-by-color/', search_by_color_view, name='filter_by_color'),
     path('filter-by-price/', search_by_rental_price_view, name='filter_by_price'),
     path('filter-by-mileage/', search_by_mileage_view, name='filter_by_mileage'),
-    #path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
+    path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
 ]

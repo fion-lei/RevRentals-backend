@@ -236,6 +236,59 @@ def search_by_color_view(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
+# Search for insurance type
+@csrf_exempt
+def search_by_insurance_view(request):
+    if request.method == "POST":
+        print("Received POST request")
+        try:
+            data = json.loads(request.body)
+            insurance = data.get('insurance')
+
+           # if not color:
+           #     return JsonResponse({'error': 'Color is required.'}, status=400)
+            if insurance:
+
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        SELECT *
+                        FROM motorized_vehicle
+                        WHERE insurance = %s
+                        """,
+                        [insurance]
+                    )
+                    rows = cursor.fetchall()
+            else:
+                 with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM motorized_vehicle")
+                    rows = cursor.fetchall()
+
+            # if you want to see all details
+            vehicles = [
+                 {
+                     "VIN": row[0],
+                     "Garage_ID": row[1],
+                     "Registration": row[2],
+                     "Rental_Price": row[3],
+                     "Color": row[4],
+                     "Mileage": row[5],
+                     "Insurance": row[6],
+                     "Model": row[7]
+                 }
+                 for row in rows
+             ]
+            # return JsonResponse({"vehicles": vehicles}, status=201)
+            
+            # Extract VINs from rows
+            #vins = [row[0] for row in rows]
+
+            print(f"Filtered vehicles: {vehicles}") #debugging
+            
+            return JsonResponse({"vehicles": vehicles}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
 
 # Search for motorized vehicles by rental price
 @csrf_exempt
