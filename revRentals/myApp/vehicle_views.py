@@ -192,22 +192,27 @@ def search_by_color_view(request):
             data = json.loads(request.body)
             color = data.get('color')
 
-            if not color:
-                return JsonResponse({'error': 'Color is required.'}, status=400)
+           # if not color:
+           #     return JsonResponse({'error': 'Color is required.'}, status=400)
+            if color:
 
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT *
-                    FROM motorized_vehicle
-                    WHERE color = %s
-                    """,
-                    [color]
-                )
-                rows = cursor.fetchall()
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        SELECT *
+                        FROM motorized_vehicle
+                        WHERE color = %s
+                        """,
+                        [color]
+                    )
+                    rows = cursor.fetchall()
+            else:
+                 with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM motorized_vehicle")
+                    rows = cursor.fetchall()
 
             # if you want to see all details
-            """ vehicles = [
+            vehicles = [
                  {
                      "VIN": row[0],
                      "Garage_ID": row[1],
@@ -219,18 +224,21 @@ def search_by_color_view(request):
                      "Model": row[7]
                  }
                  for row in rows
-             ]"""
+             ]
             # return JsonResponse({"vehicles": vehicles}, status=201)
             
             # Extract VINs from rows
-            vins = [row[0] for row in rows]
+            #vins = [row[0] for row in rows]
+
+            print(f"Filtered vehicles: {vehicles}") #debugging
             
-            return JsonResponse({"vins": vins}, status=200)
+            return JsonResponse({"vehicles": vehicles}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 
 # Search for motorized vehicles by rental price
+@csrf_exempt
 def search_by_rental_price_view(request):
     if request.method == "POST":
         try:
@@ -252,29 +260,32 @@ def search_by_rental_price_view(request):
                 rows = cursor.fetchall()
 
             # if you want to see all details
-            # vehicles = [
-            #     {
-            #         "VIN": row[0],
-            #         "Garage_ID": row[1],
-            #         "Registration": row[2],
-            #         "Rental_Price": row[3],
-            #         "Color": row[4],
-            #         "Mileage": row[5],
-            #         "Insurance": row[6],
-            #         "Model": row[7]
-            #     }
-            #     for row in rows
-            # ]
+            vehicles = [
+                 {
+                     "VIN": row[0],
+                     "Garage_ID": row[1],
+                     "Registration": row[2],
+                     "Rental_Price": row[3],
+                     "Color": row[4],
+                     "Mileage": row[5],
+                     "Insurance": row[6],
+                     "Model": row[7]
+                 }
+                 for row in rows
+             ]
             # return JsonResponse({"vehicles": vehicles}, status=201)
             
             # Extract VINs from rows
-            vins = [row[0] for row in rows]
+            #vins = [row[0] for row in rows]
+
+            print(f"Filtered vehicles: {vehicles}") #debugging
             
-            return JsonResponse({"vins": vins}, status=200)
+            return JsonResponse({"vehicles": vehicles}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search for motorized vehicles by mileage
+@csrf_exempt
 def search_by_mileage_view(request):
     if request.method == "POST":
         try:
@@ -296,25 +307,27 @@ def search_by_mileage_view(request):
                 rows = cursor.fetchall()
 
             # if you want to see all details
-            # vehicles = [
-            #     {
-            #         "VIN": row[0],
-            #         "Garage_ID": row[1],
-            #         "Registration": row[2],
-            #         "Rental_Price": row[3],
-            #         "Color": row[4],
-            #         "Mileage": row[5],
-            #         "Insurance": row[6],
-            #         "Model": row[7]
-            #     }
-            #     for row in rows
-            # ]
+            vehicles = [
+                 {
+                     "VIN": row[0],
+                     "Garage_ID": row[1],
+                     "Registration": row[2],
+                     "Rental_Price": row[3],
+                     "Color": row[4],
+                     "Mileage": row[5],
+                     "Insurance": row[6],
+                     "Model": row[7]
+                 }
+                 for row in rows
+             ]
             # return JsonResponse({"vehicles": vehicles}, status=201)
             
             # Extract VINs from rows
-            vins = [row[0] for row in rows]
+            #vins = [row[0] for row in rows]
+
+            print(f"Filtered vehicles: {vehicles}") #debugging
             
-            return JsonResponse({"vins": vins}, status=200)
+            return JsonResponse({"vehicles": vehicles}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 

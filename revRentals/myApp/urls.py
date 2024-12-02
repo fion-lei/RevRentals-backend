@@ -4,8 +4,7 @@ from .garage_views import *
 from .admin_views import *
 from .reservations_views import *
 from .vehicle_views import GetVIN
-from myApp.vehicle_views import search_by_color_view
-from myApp.vehicle_views import SearchByColorView
+from myApp.vehicle_views import *
 
 import logging
 
@@ -58,6 +57,8 @@ urlpatterns = [
 
     # Marketplace
     path('filter-by-color-view/',SearchByColorView.as_view(), name='filter_by_color_view'),
-    # path('api/filter/', filter_vehicles_view, name='filter_vehicles'),
     path('filter-by-color/', search_by_color_view, name='filter_by_color'),
+    path('filter-by-price/', search_by_rental_price_view, name='filter_by_price'),
+    path('filter-by-mileage/', search_by_mileage_view, name='filter_by_mileage'),
+    #path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
 ]
