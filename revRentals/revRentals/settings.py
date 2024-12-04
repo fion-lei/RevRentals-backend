@@ -106,7 +106,7 @@ DATABASES = {
         "HOST": env('DB_HOST'),
         "PORT": "3306",
         "OPTIONS": {
-            "ssl": { "ca": "C:/Users/maroc/OneDrive/Desktop/rev/RevRentals-backend/revRentals/revRentals/DigiCertGlobalRootCA.crt.pem"}
+            "ssl": { "ca": "/Users/kai/flutter/rev/RevRentals/revrentals-backend/RevRentals-backend/revRentals/revRentals/DigiCertGlobalRootCA.crt.pem"}
         }
     }
 }

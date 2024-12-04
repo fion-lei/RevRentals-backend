@@ -56,9 +56,10 @@ urlpatterns = [
     path('api/edit-lot-listing/',EditLotListing.as_view(), name = 'edit-lot-listing'),
 
     # Marketplace
-    path('filter-by-color-view/',SearchByColorView.as_view(), name='filter_by_color_view'),
+    #path('filter-by-color-view/',SearchByColorView.as_view(), name='filter_by_color_view'),
     path('filter-by-color/', search_by_color_view, name='filter_by_color'),
     path('filter-by-price/', search_by_rental_price_view, name='filter_by_price'),
     path('filter-by-mileage/', search_by_mileage_view, name='filter_by_mileage'),
     path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
+    path('filter-by-vehicle/', search_by_vehicle_view, name='filter_by_insurance'),
 ]
