@@ -5,6 +5,7 @@ from .admin_views import *
 from .reservations_views import *
 from .vehicle_views import GetVIN
 from myApp.vehicle_views import *
+from myApp.gear_views import *
 
 import logging
 
@@ -62,4 +63,11 @@ urlpatterns = [
     path('filter-by-mileage/', search_by_mileage_view, name='filter_by_mileage'),
     path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
     path('filter-by-vehicle/', search_by_vehicle_view, name='filter_by_insurance'),
+
+    #Gear
+    path('filter-by-gear/', search_gear_by_type_view, name='filter-by-gear'),
+    path('filter-by-gear-price/', search_gear_by_rental_price_view, name='filter-by-gear-price'),
+    path('filter-by-size/', search_gear_by_size_view, name='filter-by-size'),
+    path('filter-by-material/', search_gear_by_material_view, name='filter-by-material'),
+    path('filter-by-brand/', search_gear_by_brand_view, name='filter-by-brand'),
 ]
