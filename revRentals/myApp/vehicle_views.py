@@ -441,7 +441,9 @@ def search_by_mileage_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search for motorized vehicles by multiple conditions
+@csrf_exempt
 def search_by_multiple_conditions_view(request):
+    print("Filtering multiple conditions")
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -450,10 +452,22 @@ def search_by_multiple_conditions_view(request):
             mileage = data.get('mileage')
             rental_price = data.get('rental_price')
             color = data.get('color')
+            insurance = data.get('insurance')
             engine_type = data.get('engine_type')
             cargo_rack = data.get('cargo_rack')
             dirt_bike_type = data.get('dirt_bike_type')
-            service_details = data.get('service_details')
+            vehicle_type = data.get('vehicle_type')
+           # service_details = data.get('service_details')
+
+            print("Mileage: ", mileage, 
+                  "Rental price: ", rental_price,
+                  "Color: ", color,
+                  "Insurance: ", insurance,
+                  "Engine type ", engine_type,
+                  "Cargo Rack ", cargo_rack,
+                  "Dirt: ", dirt_bike_type,
+                  "Vehicle: ", vehicle_type)
+
             
             # Base query
             query = """
@@ -466,6 +480,7 @@ def search_by_multiple_conditions_view(request):
                     MV.Mileage,
                     MV.Insurance,
                     MV.Model,
+                    MV.Vehicle_Type,
                     M.Engine_Type,
                     Mo.Cargo_Rack,
                     DB.Dirt_Bike_Type,
@@ -504,9 +519,18 @@ def search_by_multiple_conditions_view(request):
             if dirt_bike_type:
                 conditions.append("DB.Dirt_Bike_Type = %s")
                 params.append(dirt_bike_type)
-            if service_details:
-                conditions.append("MR.SERVICE_DETAILS LIKE %s")
-                params.append(f"%{service_details}%")
+            if insurance:
+                conditions.append("MV.Insurance = %s")
+                params.append(insurance)
+            if vehicle_type:
+                if vehicle_type == "All":
+                    pass
+                else:
+                    conditions.append("MV.Vehicle_Type = %s")
+                    params.append(vehicle_type)
+           # if service_details:
+           #     conditions.append("MR.SERVICE_DETAILS LIKE %s")
+            #    params.append(f"%{service_details}%")
 
             if conditions:
                 query += " WHERE " + " AND ".join(conditions)
@@ -517,29 +541,31 @@ def search_by_multiple_conditions_view(request):
                 rows = cursor.fetchall()
 
             # # Process results, if you want to see all details
-            # vehicles = [
-            #     {
-            #         "VIN": row[0],
-            #         "Garage_ID": row[1],
-            #         "Registration": row[2],
-            #         "Rental_Price": row[3],
-            #         "Color": row[4],
-            #         "Mileage": row[5],
-            #         "Insurance": row[6],
-            #         "Model": row[7],
-            #         "Engine_Type": row[8],
-            #         "Cargo_Rack": row[9] if len(row) > 9 else None,
-            #         "Dirt_Bike_Type": row[10] if len(row) > 10 else None,
-            #         "Service_Details": row[11] if len(row) > 11 else None,
-            #     }
-            #     for row in rows
-            # ]
+            vehicles = [
+                {
+                     "VIN": row[0],
+                     "Garage_ID": row[1],
+                     "Registration": row[2],
+                     "Rental_Price": row[3],
+                     "Color": row[4],
+                     "Mileage": row[5],
+                     "Insurance": row[6],
+                     "Model": row[7],
+                     "Vehicle Type": row[8],
+                     "Engine_Type": row[9],
+                     "Cargo_Rack": row[10] if len(row) > 10 else None,
+                     "Dirt_Bike_Type": row[11] if len(row) > 11 else None,
+                   #  "Service_Details": row[11] if len(row) > 11 else None,
+                 }
+                 for row in rows
+             ]
             # return JsonResponse({"vehicles": vehicles}, status=200)
             # Extract VINs from rows
             
             vins = [row[0] for row in rows]
+            print(f"Filtered vehicles: {vehicles}") #debugging
             
-            return JsonResponse({"vins": vins}, status=200)
+            return JsonResponse({"vehicles": vehicles}, status=200)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
