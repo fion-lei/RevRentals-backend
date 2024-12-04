@@ -104,7 +104,10 @@ def search_gear_by_material_view(request):
                     "GRental_Price": row[6],
                 }
                 for row in rows
+            
             ]
+
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -142,6 +145,8 @@ def search_gear_by_type_view(request):
                 }
                 for row in rows
             ]
+
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -180,6 +185,7 @@ def search_gear_by_size_view(request):
                 }
                 for row in rows
             ]
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -218,6 +224,7 @@ def search_gear_by_rental_price_view(request):
                 }
                 for row in rows
             ]
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -273,6 +280,9 @@ def search_gear_by_multiple_conditions_view(request):
                 }
                 for row in rows
             ]
+
+            print(f"Filtered multiple: {gear}") 
+            
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)

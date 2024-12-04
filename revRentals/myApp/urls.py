@@ -63,6 +63,7 @@ urlpatterns = [
     path('filter-by-mileage/', search_by_mileage_view, name='filter_by_mileage'),
     path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
     path('filter-by-vehicle/', search_by_vehicle_view, name='filter_by_insurance'),
+    path('filter-gear-by-multiple-conditions/', search_by_multiple_conditions_view, name='filter_by_multiple_conditions'),
 
     #Gear
     path('filter-by-gear/', search_gear_by_type_view, name='filter-by-gear'),
@@ -70,4 +71,5 @@ urlpatterns = [
     path('filter-by-size/', search_gear_by_size_view, name='filter-by-size'),
     path('filter-by-material/', search_gear_by_material_view, name='filter-by-material'),
     path('filter-by-brand/', search_gear_by_brand_view, name='filter-by-brand'),
+    path('filter-gear-by-multiple-conditions/', search_gear_by_multiple_conditions_view, name='filter-gear-by-multiple-conditions'),
 ]
