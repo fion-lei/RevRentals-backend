@@ -63,10 +63,12 @@ def search_gear_by_brand_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
+            print(f"Filtered gear: {gear}")
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -101,7 +103,8 @@ def search_gear_by_material_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             
@@ -141,7 +144,8 @@ def search_gear_by_type_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
@@ -181,7 +185,8 @@ def search_gear_by_size_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
@@ -220,7 +225,8 @@ def search_gear_by_rental_price_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
@@ -276,13 +282,14 @@ def search_gear_by_multiple_conditions_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
 
             print(f"Filtered multiple: {gear}") 
-            
+
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
