@@ -6,6 +6,7 @@ import json
 # Create your views here.
 
 # View all gear
+@csrf_exempt
 def get_all_gear_view(request):
     if request.method == "GET":
         try:
@@ -31,6 +32,7 @@ def get_all_gear_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by brand
+@csrf_exempt
 def search_gear_by_brand_view(request):
     if request.method == "POST":
         try:
@@ -68,6 +70,7 @@ def search_gear_by_brand_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by material
+@csrf_exempt
 def search_gear_by_material_view(request):
     if request.method == "POST":
         try:
@@ -105,6 +108,7 @@ def search_gear_by_material_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by type
+@csrf_exempt
 def search_gear_by_type_view(request):
     if request.method == "POST":
         try:
@@ -141,6 +145,7 @@ def search_gear_by_type_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by size
+@csrf_exempt
 def search_gear_by_size_view(request):
     if request.method == "POST":
         try:
@@ -178,6 +183,7 @@ def search_gear_by_size_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by rental price
+@csrf_exempt
 def search_gear_by_rental_price_view(request):
     if request.method == "POST":
         try:
@@ -215,6 +221,7 @@ def search_gear_by_rental_price_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear with multiple conditions
+@csrf_exempt
 def search_gear_by_multiple_conditions_view(request):
     if request.method == "POST":
         try:
