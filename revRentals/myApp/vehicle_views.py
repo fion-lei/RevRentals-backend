@@ -520,8 +520,11 @@ def search_by_multiple_conditions_view(request):
                 conditions.append("DB.Dirt_Bike_Type = %s")
                 params.append(dirt_bike_type)
             if insurance:
-                conditions.append("MV.Insurance = %s")
-                params.append(insurance)
+                if insurance == "Any":
+                    pass
+                else:
+                    conditions.append("MV.Insurance = %s")
+                    params.append(insurance)
             if vehicle_type:
                 if vehicle_type == "All":
                     pass
@@ -562,7 +565,7 @@ def search_by_multiple_conditions_view(request):
             # return JsonResponse({"vehicles": vehicles}, status=200)
             # Extract VINs from rows
             
-            vins = [row[0] for row in rows]
+            #vins = [row[0] for row in rows]
             print(f"Filtered vehicles: {vehicles}") #debugging
             
             return JsonResponse({"vehicles": vehicles}, status=200)
