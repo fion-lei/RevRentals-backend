@@ -305,3 +305,63 @@ class AddMaintenanceRecordsView(APIView):
             # Handle any errors and return an appropriate response
             print("Error occurred trying to add maintenance records:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class UpdateRentalPriceViews(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            item_type = data.get('item_type')  # Expecting either 'vehicle' or 'gear'
+            item_id = data.get('id')  # ID of the motorized vehicle or gear
+            new_price = data.get('new_price')  # New rental price to update
+
+            if not item_type or not item_id or not new_price:
+                return Response(
+                    {"error": "Missing required fields: item_type, id, or new_price"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            with connection.cursor() as cursor:
+                # Update rental price for MotorizedVehicle
+                if item_type == 'vehicle':
+                    rows_updated = cursor.execute(
+                        "UPDATE motorized_vehicle SET rental_price = %s WHERE vin = %s",
+                        [new_price, item_id],
+                    )
+                    if rows_updated > 0:
+                        return Response(
+                            {"message": f"Rental price for vehicle {item_id} updated to {new_price}."},
+                            status=status.HTTP_200_OK
+                        )
+                    else:
+                        return Response(
+                            {"error": "Vehicle not found."},
+                            status=status.HTTP_404_NOT_FOUND
+                        )
+
+                # Update rental price for Gear
+                elif item_type == 'gear':
+                    rows_updated = cursor.execute(
+                        "UPDATE gear SET rental_price = %s WHERE product_no = %s",
+                        [new_price, item_id],
+                    )
+                    if rows_updated > 0:
+                        return Response(
+                            {"message": f"Rental price for gear {item_id} updated to {new_price}."},
+                            status=status.HTTP_200_OK
+                        )
+                    else:
+                        return Response(
+                            {"error": "Gear not found."},
+                            status=status.HTTP_404_NOT_FOUND
+                        )
+
+                else:
+                    return Response(
+                        {"error": "Invalid item type. Must be 'vehicle' or 'gear'."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            
+        except Exception as e:
+            print("Error occurred trying to update rental price:", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

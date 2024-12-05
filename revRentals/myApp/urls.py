@@ -24,7 +24,6 @@ urlpatterns = [
     # Marketplace
     path('api/motorized-vehicles/', ViewAllMotorizedVehicles.as_view(), name='view-all-motorized-vehicles'),
     path('api/motorized-vehicles/<str:vin>/',ViewMaintenanceRecords.as_view(), name = 'view-maintenance-records'),
-        
     path('api/storage-lots/', ViewAllStorageLots.as_view(), name='view-all-storage-lots'),
     path('api/gear-items/', ViewAllGearItems.as_view(), name='view-all-gear-items'),
     
@@ -44,6 +43,8 @@ urlpatterns = [
     path('api/add-gear-listing/', AddGearView.as_view(), name = 'add-gear'),
     path('api/view-listing/', ViewAllGarageItemsView.as_view(), name='view-listing'),
     path('api/add-maintenance-records/', AddMaintenanceRecordsView.as_view(), name='add-maintenance-records'),
+    path('api/update-rental-price/', UpdateRentalPriceViews.as_view(), name='update-rental-price'),
+    
     
     # Admin URLs
     path('api/admin-login/', AdminLoginView.as_view(), name='admin-login'),
