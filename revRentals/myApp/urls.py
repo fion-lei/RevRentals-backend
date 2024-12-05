@@ -44,6 +44,7 @@ urlpatterns = [
     path('api/view-listing/', ViewAllGarageItemsView.as_view(), name='view-listing'),
     path('api/add-maintenance-records/', AddMaintenanceRecordsView.as_view(), name='add-maintenance-records'),
     path('api/update-rental-price/', UpdateRentalPriceViews.as_view(), name='update-rental-price'),
+    path('api/rentals/buyer/<int:buyer_id>/', BuyerRentalHistoryView.as_view(), name='buyer-rental-history'),
     
     
     # Admin URLs

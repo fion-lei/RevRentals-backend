@@ -365,3 +365,61 @@ class UpdateRentalPriceViews(APIView):
         except Exception as e:
             print("Error occurred trying to update rental price:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class BuyerRentalHistoryView(APIView):
+    def get(self, request, buyer_id):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT 
+                        r.Reservation_No,
+                        r.Start_Date,
+                        r.End_Date,
+                        r.Status,
+                        t.Pay_Date AS Transaction_Date,
+                        t.Payment_Method,
+                        a.Rental_Overview,
+                        a.Damage_Compensation,
+                        a.Agreement_Fee,
+                        COALESCE(mv.Model, g.Gear_Name, sl.LAddress) AS Item_Name,
+                        mv.VIN,
+                        g.Product_No,
+                        sl.Lot_No AS Storage_Lot_No
+                    FROM reservation r
+                    LEFT JOIN agreement a ON r.Reservation_No = a.Reservation_No
+                    LEFT JOIN transaction t ON a.Agreement_ID = t.Agreement_ID
+                    LEFT JOIN motorized_vehicle mv ON r.VIN = mv.VIN
+                    LEFT JOIN gear g ON r.Product_No = g.Product_No
+                    LEFT JOIN storage_lot sl ON r.Lot_No = sl.Lot_No
+                    WHERE r.Profile_ID = %s AND r.Status = 'Paid'
+                    """,
+                    [buyer_id]
+                )
+
+                rentals = cursor.fetchall()
+
+            # Map the query result to a structured dictionary
+            rental_history = [
+                {
+                    "reservation_no": rental[0],
+                    "start_date": rental[1].strftime("%Y-%m-%d") if rental[1] else None,
+                    "end_date": rental[2].strftime("%Y-%m-%d") if rental[2] else None,
+                    "status": rental[3],
+                    "transaction_date": rental[4].strftime("%Y-%m-%d") if rental[4] else None,
+                    "payment_method": rental[5],
+                    "rental_overview": rental[6],
+                    "damage_compensation": rental[7],
+                    "agreement_fee": rental[8],
+                    "item_name": rental[9],
+                    "vin": rental[10],
+                    "product_no": rental[11],
+                    "storage_lot_no": rental[12]
+                }
+                for rental in rentals
+            ]
+
+            return Response({"success": True, "rental_history": rental_history}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"success": False, "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
