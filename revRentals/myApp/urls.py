@@ -4,6 +4,7 @@ from .garage_views import *
 from .admin_views import *
 from .reservations_views import *
 from .vehicle_views import GetVIN
+from .notifications_views import *
 from myApp.vehicle_views import *
 from myApp.gear_views import *
 
@@ -30,11 +31,12 @@ urlpatterns = [
     # Reservations for items
     path('api/add-reservation/', AddReservationView.as_view(), name='add-reservation'),
     
-    # Agreements
-    path('api/add-agreement/', AddAgreementView.as_view(), name='add-agreement'),     
-    
-    # Transactions
-    path('api/add-transaction/', AddTransactionView.as_view(), name='add-transaction'),  
+    # Agreements and Transactions
+    path('api/add-agreement/', AddAgreementView.as_view(), name='add-agreement'),
+    path('api/add-transaction/', AddTransactionView.as_view(), name='add-transaction'),
+    path('api/get-agreement/<int:reservation_no>/', GetAgreementView.as_view(), name='get-agreement'),
+    path('api/get-transaction/<int:reservation_no>/', GetTransactionView.as_view(), name='get-transaction'),
+    path('api/view-reservation-details/<int:reservation_no>/', ViewReservationDetails.as_view(), name='view-reservation-details'),
     
     # Garage
     path('api/get-garage-id/<int:profile_id>/', GetGarageIDView.as_view(), name='get_garage_id'),
@@ -56,6 +58,11 @@ urlpatterns = [
     path('api/add-lot-listing/',AddLotListing.as_view(), name = 'add-lot-listing'),
     path('api/edit-lot-listing/',EditLotListing.as_view(), name = 'edit-lot-listing'),
 
+    # notifications / reservations
+    path('api/notifications/seller/<int:seller_id>/', SellerNotificationsView.as_view(), name='seller-notifications'),
+    path('api/notifications/buyer/<int:buyer_id>/', BuyerNotificationsView.as_view(), name='buyer-notifications'),
+    path('api/reservations/<int:reservation_no>/', UpdateReservationView.as_view(), name='update-reservation'),
+    path('api/notifications/delete/<int:reservation_no>/', DeleteReservationView.as_view(), name='delete-reservation'),
     # Marketplace
     #path('filter-by-color-view/',SearchByColorView.as_view(), name='filter_by_color_view'),
     path('filter-by-color/', search_by_color_view, name='filter_by_color'),

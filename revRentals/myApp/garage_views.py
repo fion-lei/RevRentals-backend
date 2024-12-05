@@ -40,7 +40,7 @@ class AddMotorizedVehicleView(APIView):
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, [vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type])
             
-            print("vehicle was added at:")
+            print("vehicle was added at: %s", [garage_id])
 
             # Insert into the specific child table
             if vehicle_type == "Motorcycle":
