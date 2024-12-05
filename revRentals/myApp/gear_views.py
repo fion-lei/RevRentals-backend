@@ -2,10 +2,13 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db import connection
 import json
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Create your views here.
 
 # View all gear
+@csrf_exempt
 def get_all_gear_view(request):
     if request.method == "GET":
         try:
@@ -31,6 +34,7 @@ def get_all_gear_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by brand
+@csrf_exempt
 def search_gear_by_brand_view(request):
     if request.method == "POST":
         try:
@@ -59,15 +63,18 @@ def search_gear_by_brand_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
+            print(f"Filtered gear: {gear}")
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by material
+@csrf_exempt
 def search_gear_by_material_view(request):
     if request.method == "POST":
         try:
@@ -96,15 +103,20 @@ def search_gear_by_material_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
+            
             ]
+
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by type
+@csrf_exempt
 def search_gear_by_type_view(request):
     if request.method == "POST":
         try:
@@ -132,15 +144,19 @@ def search_gear_by_type_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
+
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by size
+@csrf_exempt
 def search_gear_by_size_view(request):
     if request.method == "POST":
         try:
@@ -169,15 +185,18 @@ def search_gear_by_size_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear by rental price
+@csrf_exempt
 def search_gear_by_rental_price_view(request):
     if request.method == "POST":
         try:
@@ -206,15 +225,18 @@ def search_gear_by_rental_price_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
+            print(f"Filtered gear: {gear}") #debugging
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search gear with multiple conditions
+@csrf_exempt
 def search_gear_by_multiple_conditions_view(request):
     if request.method == "POST":
         try:
@@ -260,10 +282,14 @@ def search_gear_by_multiple_conditions_view(request):
                     "Material": row[3],
                     "Type": row[4],
                     "Size": row[5],
-                    "GRental_Price": row[6],
+                    "GRentalPrice": row[6],
+                    "Gear_Name": row[7],
                 }
                 for row in rows
             ]
+
+            print(f"Filtered multiple: {gear}") 
+
             return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
