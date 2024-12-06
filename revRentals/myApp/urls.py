@@ -53,12 +53,12 @@ urlpatterns = [
     # Agreements, Reservations, Transactions
     path('api/agreements/', ViewAllAgreements.as_view(), name ='view-agreements'),
     path('api/reservations/', ViewAllReservations.as_view(), name ='view-reservations'),
-    path('api/view-transaction/<int:reservation_no>/', GetTransactionView.as_view(), name = 'view-transaction' ),
-    path('api/view-agreement/<int:reservation_no>/', GetAgreementView.as_view(), name = 'view-agreement' ),
+    path('api/get-transaction/<int:reservation_no>/', GetTransactionView.as_view(), name = 'get-transaction' ),
+
     
     # Lots
     path('api/add-lot-listing/',AddLotListing.as_view(), name = 'add-lot-listing'),
-    path('api/edit-lot-listing/',EditLotListing.as_view(), name = 'edit-lot-listing'),
+    path('api/edit-lot-listing/<int:lot_no>/',EditLotListing.as_view(), name = 'edit-lot-listing'),
 
     # notifications / reservations
     path('api/notifications/seller/<int:seller_id>/', SellerNotificationsView.as_view(), name='seller-notifications'),

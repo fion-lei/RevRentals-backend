@@ -352,7 +352,8 @@ class ViewReservationDetails(APIView):
                         p.Last_Name,
                         r.VIN,
                         r.Product_No,
-                        r.Lot_No
+                        r.Lot_No,
+                        r.Status
                     FROM reservation r
                     JOIN profile p ON r.Profile_ID = p.Profile_ID
                     WHERE r.Reservation_No = %s
@@ -365,9 +366,12 @@ class ViewReservationDetails(APIView):
                         {"error": "Reservation not found"},
                         status=status.HTTP_404_NOT_FOUND
                     )
-
+         
+                item_name = None
+                item_name = None
                 # Unpack the basic info
-                reservation_no, start_date, end_date, first_name, last_name, vin, product_no, lot_no = row
+                # reservation_no, start_date, end_date, first_name, last_name, vin, product_no, lot_no = row
+                reservation_no, start_date, end_date, first_name, last_name, vin, product_no, lot_no, reservation_status = row
                 item_name = None
                 rental_price = None
 
@@ -418,7 +422,8 @@ class ViewReservationDetails(APIView):
                     "item_name": item_name,
                     "rental_price": rental_price,
                     "duration_days": duration,
-                    "total_price": total_price
+                    "total_price": total_price,
+                    "status":reservation_status
                 }, status=status.HTTP_200_OK)
                 
         except Exception as e:

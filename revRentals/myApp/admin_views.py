@@ -158,7 +158,30 @@ class AddLotListing(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class EditLotListing(APIView):
-    def get():
-        print("")  
-    def post():
-        print("")
+    def put(self, request, lot_no):
+        try:
+            data = request.data
+            laddress = data.get("laddress")
+            if not laddress or not lot_no: 
+                return Response(
+                    {"error": "Missing required fields: lot_no, laddress"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Use a transaction to ensure the update is atomic
+            with connection.cursor() as cursor:
+                    cursor.execute(
+                        """
+                        UPDATE Storage_Lot
+                        SET Laddress = %s
+                        WHERE Lot_No = %s;
+                        """, [laddress, lot_no]
+            )
+
+            return Response(
+                {"message": f"Lot address for lot number {lot_no} updated to {laddress}."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            print("Error occurred trying to update lot address:", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
