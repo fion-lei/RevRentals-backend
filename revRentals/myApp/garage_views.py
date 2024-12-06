@@ -243,7 +243,7 @@ class ViewAllStorageLots(APIView):
             # Query the storage_lots table
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT Lot_No, LAddress, Admin_ID
+                    SELECT Lot_No, LAddress, Admin_ID, LRentalPrice
                     FROM storage_lot
                 """)
                 storage_lots = cursor.fetchall()
@@ -254,6 +254,7 @@ class ViewAllStorageLots(APIView):
                     "Lot_No": row[0],
                     "LAddress": row[1],
                     "Admin_ID": row[2],
+                    "LRentalPrice": float(row[3]) if row[3] is not None else 0.0,
                 }
                 for row in storage_lots
             ]
