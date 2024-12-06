@@ -65,6 +65,8 @@ urlpatterns = [
     path('api/notifications/buyer/<int:buyer_id>/', BuyerNotificationsView.as_view(), name='buyer-notifications'),
     path('api/reservations/<int:reservation_no>/', UpdateReservationView.as_view(), name='update-reservation'),
     path('api/notifications/delete/<int:reservation_no>/', DeleteReservationView.as_view(), name='delete-reservation'),
+    path('api/notifications/check/<int:profile_id>/', CheckNotificationsView.as_view(), name='check-notifications'),
+    
     # Marketplace
     #path('filter-by-color-view/',SearchByColorView.as_view(), name='filter_by_color_view'),
     path('filter-by-color/', search_by_color_view, name='filter_by_color'),

@@ -152,4 +152,34 @@ class DeleteReservationView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+# method for showing red dot on marketplace page
+class CheckNotificationsView(APIView):
+    def get(self, request, profile_id):
+        try:
+            with connection.cursor() as cursor:
+                # Check for buyer notifications (status = Approved or Rejected)
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM reservation r
+                    WHERE r.Profile_ID = %s AND r.Status IN ('Approved', 'Rejected')
+                """, [profile_id])
+                buyer_notifications = cursor.fetchone()[0]
+
+                # Check for seller notifications (status = Pending Approval)
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM reservation r
+                    WHERE r.Seller_ID = %s AND r.Status = 'Pending Approval'
+                """, [profile_id])
+                seller_notifications = cursor.fetchone()[0]
+
+            # If either buyer or seller has notifications, return True
+            has_notifications = buyer_notifications > 0 or seller_notifications > 0
+
+            return Response({"success": True, "has_notifications": has_notifications}, status=200)
+        except Exception as e:
+            print(f"Error in CheckNotificationsView: {e}")
+            return Response({"success": False, "error": str(e)}, status=500)
+
+
 
