@@ -10,20 +10,29 @@ def get_all_storage_lots_view(request):
     if request.method == "GET":
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM Storage_Lot")
+                cursor.execute("SELECT Lot_No, LAddress, Admin_ID, LRentalPrice FROM Storage_Lot")
                 rows = cursor.fetchall()
+                
+                # Debug print raw rows
+                print("Raw rows from database:", rows)
 
-            # Convert rows to list of dictionaries
-            storage_lots = [
-                {
+            # Convert rows to list of dictionaries with debug prints
+            storage_lots = []
+            for row in rows:
+                print("Processing row:", row)  # Debug print each row
+                lot_dict = {
                     "Lot_No": row[0],
                     "LAddress": row[1],
                     "Admin_ID": row[2],
+                    "LRentalPrice": float(row[3]) if row[3] is not None else 0.0,
                 }
-                for row in rows
-            ]
+                print("Created dictionary:", lot_dict)  # Debug print created dictionary
+                storage_lots.append(lot_dict)
+
+            print("Final storage_lots list:", storage_lots)  # Debug final list
             return JsonResponse({"storage_lots": storage_lots}, status=200)
         except Exception as e:
+            print("Error in get_all_storage_lots_view:", str(e))  # Debug print any errors
             return JsonResponse({'error': str(e)}, status=400)
 
 # Search lot by address

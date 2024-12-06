@@ -1,8 +1,11 @@
+# Add Reservation, Works for motorcycle, gear, and lot
+from datetime import datetime
 from django.db import connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-# Add Reservation, Works for motorcycle, gear, and lot
+from rest_framework.test import APIRequestFactory
+
 class AddReservationView(APIView):
     def post(self, request):
         try:
@@ -13,10 +16,6 @@ class AddReservationView(APIView):
             vin = data.get("vin")
             start_date = data.get("start_date")
             end_date = data.get("end_date")
-
-            print("VIN", vin)
-            print("Lot_no", lot_no)
-            print("Product_no", product_no)
 
             with connection.cursor() as cursor:
                 # Fetch the Admin ID (assuming there's only one admin)
@@ -33,7 +32,6 @@ class AddReservationView(APIView):
 
                 # Retrieve Seller_ID based on the input type
                 if vin:
-                    # Fetch the Seller_ID using VIN from the MOTOR_VEHICLE and GARAGE tables
                     cursor.execute("""
                         SELECT p.Profile_ID
                         FROM motorized_vehicle mv
@@ -47,7 +45,6 @@ class AddReservationView(APIView):
                         seller_id = result[0]
 
                 elif product_no:
-                    # Fetch the Seller_ID using Product_No from the GEAR and GARAGE tables
                     cursor.execute("""
                         SELECT p.Profile_ID
                         FROM gear g
@@ -61,42 +58,67 @@ class AddReservationView(APIView):
                         seller_id = result[0]
 
                 elif lot_no:
-                    # Fetch the Seller_ID using Lot_No from the STORAGE_LOT and GARAGE tables
-                    cursor.execute("""
-                        SELECT p.Profile_ID
-                        FROM storage_lot sl
-                        INNER JOIN admin a ON sl.Admin_ID = a.Admin_ID
-                        INNER JOIN garage g ON g.Admin_ID = a.Admin_ID
-                        INNER JOIN has h ON g.Garage_ID = h.Garage_ID
-                        INNER JOIN profile p ON h.Profile_ID = p.Profile_ID
-                        WHERE sl.Lot_No = %s
-                    """, [lot_no])
-                    result = cursor.fetchone()
-                    if result:
-                        seller_id = result[0]
+                    seller_id = admin_id
 
-                print(seller_id)
-                # If seller_id is not found, return an error
                 if not seller_id:
                     return Response({"Error": "Could not find the Seller_ID for the provided VIN, Product_No, or Lot_No."},
                                     status=status.HTTP_400_BAD_REQUEST)
 
-                # Insert the reservation with the correct Seller_ID
+                # Set status based on item type
+                status_value = "Pending Approval"
+
+                # Insert the reservation
                 cursor.execute("""
                     INSERT INTO reservation(Profile_ID, Admin_ID, Product_no, VIN, Lot_No, Start_Date, End_Date, Status, Seller_ID)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, [profile_id, admin_id, product_no, vin, lot_no, start_date, end_date, "Pending Approval", seller_id])
+                """, [profile_id, admin_id, product_no, vin, lot_no, start_date, end_date, status_value, seller_id])
 
-                print("Reservation added.")
+                # Get the reservation number
+                cursor.execute("""
+                    SELECT Reservation_No
+                    FROM reservation
+                    WHERE Profile_ID = %s
+                    AND Admin_ID = %s
+                    AND Start_Date = %s
+                    AND End_Date = %s
+                    AND Status = %s
+                    ORDER BY Reservation_No DESC
+                    LIMIT 1
+                """, [profile_id, admin_id, start_date, end_date, status_value])
+                
+                reservation_no = cursor.fetchone()[0]
+
+                # If Lot_No, call AddAgreementView
+                if lot_no:
+                    factory = APIRequestFactory()
+                    agreement_request = factory.post(
+                        "/api/add-agreement/",
+                        {"reservation_no": reservation_no},
+                        format="json"
+                    )
+                    agreement_view = AddAgreementView.as_view()
+                    response = agreement_view(agreement_request)
+
+                    # Ensure the response for the reservation returns 201 Created
+                    if response.status_code == 200:
+                        return Response(
+                            {"success": True,
+                             "message": "Reservation and agreement added successfully.",
+                             "reservation_no": reservation_no},
+                            status=status.HTTP_201_CREATED
+                        )
+                    else:
+                        return response
+
                 return Response(
                     {"success": True, "message": "Reservation added successfully."},
                     status=status.HTTP_201_CREATED
                 )
 
         except Exception as e:
-            # Handle any errors and return an appropriate response
             print("Error occurred:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # TODO: Get agreement via reservation_no
 class GetAgreementView(APIView):
@@ -237,7 +259,7 @@ class AddAgreementView(APIView):
                     item_type = "Gear"
                 elif lot_no:
                     cursor.execute("""
-                        SELECT Lot_Name, Lot_Rate
+                        SELECT LAddress, LRentalPrice
                         FROM storage_lot
                         WHERE Lot_No = %s
                     """, [lot_no])
@@ -260,7 +282,10 @@ class AddAgreementView(APIView):
                 rental_overview = f"{item_type} rental for {rental_days} days: {start_date} to {end_date}"
 
                 # Set a fixed damage compensation
-                damage_compensation = 200
+                if lot_no:
+                    damage_compensation = 0
+                else:
+                    damage_compensation = 200
 
                 # Insert into agreement table
                 cursor.execute("""
@@ -400,14 +425,14 @@ class ViewReservationDetails(APIView):
                 
                 elif lot_no:
                     cursor.execute("""
-                        SELECT LAddress 
+                        SELECT LAddress, LRentalPrice
                         FROM storage_lot 
                         WHERE Lot_No = %s
                     """, [lot_no])
                     lot_info = cursor.fetchone()
                     if lot_info:
                         item_name = lot_info[0]
-                        rental_price = 50.0  # You may want to get this from your lot table
+                        rental_price = float(lot_info[1])
                 
                 # Calculate rental duration and total price
                 duration = (end_date - start_date).days + 1
@@ -426,6 +451,50 @@ class ViewReservationDetails(APIView):
                     "status":reservation_status
                 }, status=status.HTTP_200_OK)
                 
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+
+class CheckActiveLotRentalView(APIView):
+    def get(self, request, profile_id):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT 
+                        r.Reservation_No,
+                        r.Lot_No,
+                        sl.LAddress,
+                        r.Start_Date,
+                        r.End_Date
+                    FROM reservation r
+                    JOIN storage_lot sl ON r.Lot_No = sl.Lot_No
+                    WHERE r.Profile_ID = %s
+                    AND r.Status = 'Paid'
+                    AND r.End_Date >= CURRENT_DATE
+                    AND r.Lot_No IS NOT NULL
+                """, [profile_id])
+                
+                rental = cursor.fetchone()
+                
+                if rental:
+                    return Response({
+                        "has_active_rental": True,
+                        "rental_details": {
+                            "reservation_no": rental[0],
+                            "lot_no": rental[1],
+                            "address": rental[2],
+                            "start_date": rental[3].strftime("%Y-%m-%d"),
+                            "end_date": rental[4].strftime("%Y-%m-%d")
+                        }
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "has_active_rental": False
+                    }, status=status.HTTP_200_OK)
+                    
         except Exception as e:
             return Response(
                 {"error": str(e)},
