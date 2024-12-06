@@ -311,6 +311,19 @@ def insert_gear_view(request):
             if not all([garage_id, brand, material, gear_type, size, rental_price]):
                 return JsonResponse({'error': 'All fields except gear_name are required.'}, status=400)
 
+            # Check the number of gear items in the garage
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) FROM Gear WHERE Garage_ID = %s
+                    """,
+                    [garage_id]
+                )
+                gear_count = cursor.fetchone()[0]
+
+            if gear_count >= 5:
+                return JsonResponse({'error': 'You can only have up to 5 gear items listed in your garage.'}, status=403)
+
             # Insert into Gear table
             with connection.cursor() as cursor:
                 cursor.execute(

@@ -6,102 +6,143 @@ from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
-#add motorized vehicle
+#add motorized vehicle with added restriction of only be able to list 2 vehicles
 class AddMotorizedVehicleView(APIView):
     def post(self, request):
         try:
-            # Parse the incoming data
+            # Parse user input
             data = request.data
-            vehicle_type = data.get("vehicle_type")  # 'Motorcycle', 'Moped', or 'Dirtbike'
-            vin = data.get("vin")
-            registration = data.get("registration")
-            rental_price = data.get("rental_price")
-            color = data.get("color")
-            mileage = data.get("mileage")
-            insurance = data.get("insurance")
-            model = data.get("model")
-            specific_attribute = data.get("specific_attribute")  # Engine_Type, Cargo_Rack, or Dirt_Bike_Type
-            garage_id = data.get("garage_id")
+            vin = data.get('vin')
+            garage_id = data.get('garage_id')
+            registration = data.get('registration')
+            rental_price = data.get('rental_price')
+            color = data.get('color')
+            mileage = data.get('mileage')
+            insurance = data.get('insurance')
+            model = data.get('model')
+            vehicle_type = data.get('vehicle_type')
 
-            # Validate that the garage exists
+            print("this is the color" + color)
+            # Validate required fields
+            if not all([vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type]):
+                return Response({'error': 'All fields, including vehicle_type, are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check the number of motorized vehicles in the garage
             with connection.cursor() as cursor:
-                cursor.execute("SELECT COUNT(*) FROM garage WHERE Garage_ID = %s", [garage_id])
-                garage_exists = cursor.fetchone()[0]
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) FROM motorized_vehicle WHERE Garage_ID = %s
+                    """,
+                    [garage_id]
+                )
+                vehicle_count = cursor.fetchone()[0]
 
-            if not garage_exists:
-                print("garage does not exist")
-                return Response({"error": "Invalid garage ID."}, status=status.HTTP_400_BAD_REQUEST)
+            if vehicle_count >= 2:
+                return Response({'error': 'You can only have up to 2 motorized vehicles listed in your garage.'}, status=status.HTTP_403_FORBIDDEN)
 
-            # Insert into motorized_vehicle table
-            print("inserting vehicle")
+            # Insert into Motorized_Vehicle table
             with connection.cursor() as cursor:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO motorized_vehicle (VIN, Garage_ID, Registration, Rental_Price, Color, Mileage, Insurance, Model, Vehicle_Type)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, [vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type])
-            
-            print("vehicle was added at: %s", [garage_id])
+                    """,
+                    [vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type]
+                )
 
-            # Insert into the specific child table
-            if vehicle_type == "Motorcycle":
-                print("motorcycle type")
-                with connection.cursor() as cursor:
-                    cursor.execute("""
+                # Insert into the corresponding child table
+                if vehicle_type.lower() == 'motorcycle':
+                    engine_type = data.get('engine_type', None)
+                    cursor.execute(
+                        """
                         INSERT INTO motorcycle (VIN, Engine_Type)
                         VALUES (%s, %s)
-                    """, [vin, specific_attribute])
-                print("motorcycle added")
-
-            elif vehicle_type == "Moped":
-                print("Moped type")
-                with connection.cursor() as cursor:
-                    cursor.execute("""
+                        """,
+                        [vin, engine_type]
+                    )
+                elif vehicle_type.lower() == 'moped':
+                    cargo_rack = data.get('cargo_rack', None)
+                    cursor.execute(
+                        """
                         INSERT INTO moped (VIN, Cargo_Rack)
                         VALUES (%s, %s)
-                    """, [vin, specific_attribute])
-
-            elif vehicle_type == "Dirtbike":
-                print("Dirtbike type")
-                with connection.cursor() as cursor:
-                    cursor.execute("""
-                        INSERT INTO dirt_bike (VIN, Terrain_Type)
+                        """,
+                        [vin, cargo_rack]
+                    )
+                elif vehicle_type.lower() == 'dirtbike':
+                    dirt_bike_type = data.get('dirt_bike_type', None)
+                    cursor.execute(
+                        """
+                        INSERT INTO dirt_bike (VIN, Dirt_Bike_Type)
                         VALUES (%s, %s)
-                    """, [vin, specific_attribute])
+                        """,
+                        [vin, dirt_bike_type]
+                    )
+                else:
+                    return Response({'error': f"Invalid vehicle type: {vehicle_type}"}, status=status.HTTP_400_BAD_REQUEST)
 
-            else:
-                print("Invalid vehicle type:", vehicle_type) 
-                return Response({"error": "Invalid vehicle type."}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Return success response
-            print("All operations completed successfully.") 
-            return Response({"success": True, "message": "Vehicle added successfully."}, status=status.HTTP_201_CREATED)
+            return Response({'message': f"{vehicle_type.capitalize()} added successfully."}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
-            # Handle any errors and return an appropriate response
-            print("Error occurred:", str(e))
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-# TODO: Add gear
 class AddGearView(APIView):
     def post(self, request):
         try:
+            # Parse user input
             data = request.data
             garage_id = data.get("garage_id")
             brand = data.get("brand")
             material = data.get("material")
-            type = data.get("type")
+            gear_type = data.get("type")
             size = data.get("size")
             rental_price = data.get("rental_price")
             gear_name = data.get("gear_name")
+
+            # Validate required fields
+            if not all([garage_id, brand, material, gear_type, size, rental_price, gear_name]):
+                return Response(
+                    {"error": "All fields are required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Check if the user has reached the limit of 5 gears
             with connection.cursor() as cursor:
-                cursor.execute("""
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) 
+                    FROM gear 
+                    WHERE Garage_ID = %s
+                    """,
+                    [garage_id],
+                )
+                current_gear_count = cursor.fetchone()[0]
+
+            if current_gear_count >= 5:
+                return Response(
+                    {"error": "You cannot add more than 5 gear listings to the marketplace."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Insert the gear into the Gear table
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
                     INSERT INTO gear(Garage_ID, Brand, Material, Type, Size, GRentalPrice, Gear_Name) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
-                               """, [garage_id, brand, material, type, size, rental_price, gear_name])
-            return Response({"success": True, "message": "Gear added successfully."}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    """,
+                    [garage_id, brand, material, gear_type, size, rental_price, gear_name],
+                )
 
+            return Response(
+                {"success": True, "message": "Gear added successfully."},
+                status=status.HTTP_201_CREATED,
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 class ViewAllMotorizedVehicles(APIView):
     def get(self, request):
         try:
