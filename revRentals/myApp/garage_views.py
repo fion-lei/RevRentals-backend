@@ -383,7 +383,7 @@ class UpdateRentalPriceViews(APIView):
                 # Update rental price for Gear
                 elif item_type == 'gear':
                     rows_updated = cursor.execute(
-                        "UPDATE gear SET rental_price = %s WHERE product_no = %s",
+                        "UPDATE gear SET grentalprice = %s WHERE product_no = %s",
                         [new_price, item_id],
                     )
                     if rows_updated > 0:
