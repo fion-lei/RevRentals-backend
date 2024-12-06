@@ -67,6 +67,16 @@ class RegisterView(APIView):
             if email_exists:
                 print("email exists already.")
                 return Response({"error": "A profile with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check if the username already exists
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM profile WHERE Username = %s", [username])
+                username_exists = cursor.fetchone()[0]
+
+            if username_exists:
+                print("Username exists already.")
+                return Response({"error": "A profile with this username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
 
             # Hash the password
             hashed_password = make_password(password)
