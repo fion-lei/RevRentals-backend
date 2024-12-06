@@ -82,11 +82,14 @@ class ViewAllReservations(APIView):
                 {
                     "Reservation_No": row[0],
                     "Profile_ID": row[1],
-                    "Admin_ID": row[2],
-                    "Lot_No": row[3],
-                    "Start_Date": row[4],
-                    "End_Date": row[5],
-                    "Status": row[6]
+                    "Seller_ID": row[2],
+                    "Admin_ID": row[3],
+                    "Lot_No": row[4],
+                    "Start_Date": row[5],
+                    "End_Date": row[6],
+                    "Status": row[7],
+                    "VIN":row[8],
+                    "Product_no": row[9]
                 }
                 for row in rows
             ]
