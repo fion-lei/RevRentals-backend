@@ -7,7 +7,7 @@ from .vehicle_views import GetVIN
 from .notifications_views import *
 from myApp.vehicle_views import *
 from myApp.gear_views import *
-
+from .storage_lot_views import *
 import logging
 
 logger = logging.getLogger(__name__)

@@ -162,9 +162,13 @@ class EditLotListing(APIView):
         try:
             data = request.data
             laddress = data.get("laddress")
-            if not laddress or not lot_no: 
+            lrentalprice = data.get("lrentalprice")
+            print(laddress)
+            print(lrentalprice)
+            print(lot_no)
+            if not laddress or not lot_no or not lrentalprice: 
                 return Response(
-                    {"error": "Missing required fields: lot_no, laddress"},
+                    {"error": "Missing required fields: lot_no, laddress, lrentalprice"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
@@ -173,9 +177,9 @@ class EditLotListing(APIView):
                     cursor.execute(
                         """
                         UPDATE Storage_Lot
-                        SET Laddress = %s
+                        SET Laddress = %s, LRentalPrice=%s
                         WHERE Lot_No = %s;
-                        """, [laddress, lot_no]
+                        """, [laddress, lrentalprice, lot_no]
             )
 
             return Response(
