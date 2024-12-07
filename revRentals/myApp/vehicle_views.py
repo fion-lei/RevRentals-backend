@@ -444,21 +444,21 @@ def search_by_mileage_view(request):
 @csrf_exempt
 def search_by_multiple_conditions_view(request):
     print("Filtering multiple conditions")
-    if request.method == "POST":
+    if request.method == "GET":
         try:
-            data = json.loads(request.body)
+            #data = json.loads(request.body)
             
             # Extract search parameters
-            mileage = data.get('mileage')
-            rental_price = data.get('rental_price')
-            color = data.get('color')
-            insurance = data.get('insurance')
-            engine_type = data.get('engine_type')
-            cargo_rack = data.get('cargo_rack')
-            dirt_bike_type = data.get('dirt_bike_type')
-            vehicle_type = data.get('vehicle_type')
-           # service_details = data.get('service_details')
+            mileage = request.GET.get('mileage', "Any")
+            rental_price = request.GET.get('rental_price', "Any")
+            color = request.GET.get('color', "Any")
+            insurance = request.GET.get('insurance', "Any")
+            engine_type = request.GET.get('engine_type', "Any")
+            cargo_rack = request.GET.get('cargo_rack', "Any")
+            dirt_bike_type = request.GET.get('dirt_bike_type', "Any")
+            vehicle_type = request.GET.get('vehicle', "All")
 
+            #For debugging
             print("Mileage: ", mileage, 
                   "Rental price: ", rental_price,
                   "Color: ", color,
@@ -467,6 +467,8 @@ def search_by_multiple_conditions_view(request):
                   "Cargo Rack ", cargo_rack,
                   "Dirt: ", dirt_bike_type,
                   "Vehicle: ", vehicle_type)
+            
+            print("Request Data: ", request.GET)
 
             
             # Base query
@@ -501,42 +503,49 @@ def search_by_multiple_conditions_view(request):
             conditions = []
             params = []
 
-            if mileage is not None:
+            if mileage != "Any":
                 conditions.append("MV.Mileage <= %s")
                 params.append(mileage)
-            if rental_price is not None:
+            if rental_price != "Any":
                 conditions.append("MV.Rental_Price <= %s")
                 params.append(rental_price)
-            if color:
-                conditions.append("MV.Color = %s")
-                params.append(color)
-            if engine_type:
+            if engine_type != "Any":
                 conditions.append("M.Engine_Type = %s")
                 params.append(engine_type)
-            if cargo_rack is not None:  # Boolean for mopeds
+            if cargo_rack != "Any":  # Boolean for mopeds
                 conditions.append("Mo.Cargo_Rack = %s")
                 params.append(cargo_rack)
-            if dirt_bike_type:
+            if dirt_bike_type != "Any":
                 conditions.append("DB.Dirt_Bike_Type = %s")
                 params.append(dirt_bike_type)
-            if insurance:
-                if insurance == "Any":
-                    pass
-                else:
-                    conditions.append("MV.Insurance = %s")
-                    params.append(insurance)
-            if vehicle_type:
-                if vehicle_type == "All":
-                    pass
-                else:
-                    conditions.append("MV.Vehicle_Type = %s")
-                    params.append(vehicle_type)
-           # if service_details:
-           #     conditions.append("MR.SERVICE_DETAILS LIKE %s")
-            #    params.append(f"%{service_details}%")
+            if insurance != "Any":
+                conditions.append("MV.Insurance = %s")
+                params.append(insurance)
+            if vehicle_type != "All":
+                conditions.append("MV.Vehicle_Type = %s")
+                params.append(vehicle_type)
+            if color == "Other":
+                allowed_colors = ['Red',
+                                'Orange',
+                                'Yellow',
+                                'Green',
+                                'Blue',
+                                'Purple',
+                                'Pink',
+                                'Black',
+                                'White',] # these are all colors on front-end dropdown menu
+                conditions.append("MV.Color NOT IN ({})".format(", ".join(["%s"] * len(allowed_colors))))
+                params.extend(allowed_colors)
+            elif color != "Any":
+                conditions.append("MV.Color = %s")
+                params.append(color)
+
 
             if conditions:
                 query += " WHERE " + " AND ".join(conditions)
+
+            # checking log
+            print("Executing params:", params)
 
             # Execute query
             with connection.cursor() as cursor:
@@ -558,7 +567,6 @@ def search_by_multiple_conditions_view(request):
                      "Engine_Type": row[9],
                      "Cargo_Rack": row[10] if len(row) > 10 else None,
                      "Dirt_Bike_Type": row[11] if len(row) > 11 else None,
-                   #  "Service_Details": row[11] if len(row) > 11 else None,
                  }
                  for row in rows
              ]
@@ -573,7 +581,7 @@ def search_by_multiple_conditions_view(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     else:
-        return JsonResponse({"error": "Invalid HTTP method. Only POST is allowed."}, status=405)
+        return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
 
 # def insert_motorized_vehicle_view(request):
 #     if request.method == "POST":
