@@ -75,6 +75,8 @@ urlpatterns = [
     path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
     path('filter-by-vehicle/', search_by_vehicle_view, name='filter_by_insurance'),
     path('filter-by-multiple-conditions/', search_by_multiple_conditions_view, name='filter_by_multiple_conditions'),
+    path('get-all-vehicles/', get_vehicles_view, name='get-all-vehicles'),
+
 
     #Gear
     path('filter-by-gear/', search_gear_by_type_view, name='filter-by-gear'),

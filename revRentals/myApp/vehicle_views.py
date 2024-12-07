@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 # Get all motorized vehicles
+@csrf_exempt
 def get_vehicles_view(request):
     if request.method == "GET":
         try:
