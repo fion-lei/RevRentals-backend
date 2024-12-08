@@ -145,13 +145,14 @@ class AddLotListing(APIView):
             print(data)
             admin_id = data.get("admin_id")
             laddress = data.get("laddress")
+            lrentalprice = data.get("lrentalprice")
             
             # Insert into storage lots table
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO Storage_lot(Admin_ID, LAddress)
-                    VALUES (%s, %s)
-                               """, [admin_id, laddress])
+                    INSERT INTO Storage_lot(Admin_ID, LAddress, LRentalPrice)
+                    VALUES (%s, %s, %s)
+                               """, [admin_id, laddress,lrentalprice])
             return Response({"success": True, "message": "Storage lot added successfully."}, status=status.HTTP_201_CREATED)
         
         except Exception as e:
