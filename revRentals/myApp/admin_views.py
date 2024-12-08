@@ -5,7 +5,7 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+import hashlib
 from django.contrib.auth.hashers import check_password
 
 # Create your views here.
@@ -15,8 +15,10 @@ class AdminLoginView(APIView):
             data = request.data
             username = data.get("username")
             password = data.get("password")
-            print(username)
-            print(password)
+
+            # Check if the required fields are provided
+            if not username or not password:
+                return Response({"error": "Username and password are required."}, status=status.HTTP_400_BAD_REQUEST)
 
             # Query the database for admin username
             with connection.cursor() as cursor:
@@ -24,25 +26,28 @@ class AdminLoginView(APIView):
                     SELECT Admin_ID, Admin_Name, Admin_Password
                     FROM admin
                     WHERE Admin_Name = %s
-                    """, [username]) 
+                    """, [username])
                 admin = cursor.fetchone()
-                
+
             if admin:
-                admin_id, admin_name, admin_password = admin
-                if password == admin_password:
+                admin_id, admin_name, stored_hash = admin
+
+                # Hash the provided password using SHA2(256) to compare with stored hash
+                password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+                if password_hash == stored_hash:
                     return Response({
                         "success": True,
-                        
                         "message": "Login successful",
                         "admin_id": admin_id,
-        
-                    }, status = status.HTTP_200_OK)
+                    }, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
             else:
-                    return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)     
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
                    
 # TODO: Get admin id
 class GetAdminIDView(APIView):
