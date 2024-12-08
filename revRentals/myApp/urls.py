@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/login/', LoginView.as_view(), name='login'),
     path('api/register/', RegisterView.as_view(), name='register'),
     path('api/profile-details/', ProfileDetailsView.as_view(), name='profile-details'),
+    path('api/profile-details/<int:profile_id>/', ProfileDetailsView.as_view(), name='get-profile-details'),
     path('api/get-profile-id/<str:username>/', GetProfileIDView.as_view(), name='get-profile-id'),
     
     # Marketplace
