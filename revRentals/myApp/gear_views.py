@@ -238,32 +238,43 @@ def search_gear_by_rental_price_view(request):
 # Search gear with multiple conditions
 @csrf_exempt
 def search_gear_by_multiple_conditions_view(request):
-    if request.method == "POST":
+    if request.method == "GET":
         try:
-            data = json.loads(request.body)
-            brand = data.get('brand')
-            material = data.get('material')
-            gear_type = data.get('type')
-            size = data.get('size')
-            max_price = data.get('grental_price')
+            #data = json.loads(request.body)
+
+            brand = request.GET.get('brand', "Any")
+            material = request.GET.get('material', "Any")
+            gear_type = request.GET.get('type', "All")
+            size = request.GET.get('size', "Any")
+            max_price = request.GET.get('grental_price', "Any")
+
+            #For debugging
+            print("Brand: ", brand, 
+                  "Rental price: ", max_price,
+                  "Type: ", gear_type,
+                  "Size: ", size,
+                  "Material: ", material,
+                    )
+            
+            print("Request Data: ", request.GET)
 
             query = "SELECT * FROM Gear"
             conditions = []
             params = []
 
-            if brand:
+            if brand != "Any":
                 conditions.append("brand = %s")
                 params.append(brand)
-            if material:
+            if material != "Any":
                 conditions.append("material = %s")
                 params.append(material)
-            if gear_type:
+            if gear_type != "All":
                 conditions.append("type = %s")
                 params.append(gear_type)
-            if size:
+            if size != "Any":
                 conditions.append("size = %s")
                 params.append(size)
-            if max_price:
+            if max_price != "Any":
                 conditions.append("grental_price < %s")
                 params.append(max_price)
 

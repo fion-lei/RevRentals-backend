@@ -44,7 +44,7 @@ def get_vehicles_view(request):
 # Search for motorcycles by engine type
 @csrf_exempt
 def search_by_engine_view(request):
-    if request.method == "POST":
+    if request.method == "GET":
         try:
             # Parse JSON request body
             data = json.loads(request.body)
@@ -447,8 +447,6 @@ def search_by_multiple_conditions_view(request):
     print("Filtering multiple conditions")
     if request.method == "GET":
         try:
-            #data = json.loads(request.body)
-            
             # Extract search parameters
             mileage = request.GET.get('mileage', "Any")
             rental_price = request.GET.get('rental_price', "Any")
@@ -470,7 +468,6 @@ def search_by_multiple_conditions_view(request):
                   "Vehicle: ", vehicle_type)
             
             print("Request Data: ", request.GET)
-
             
             # Base query
             query = """
@@ -759,4 +756,4 @@ class GetVIN(APIView):
             return Response({"vin": vin} , status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)  
-    
+

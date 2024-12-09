@@ -79,6 +79,7 @@ urlpatterns = [
 
 
     #Gear
+    path('get-all-gear/', get_all_gear_view, name='get-all-gear'),
     path('filter-by-gear/', search_gear_by_type_view, name='filter-by-gear'),
     path('filter-by-gear-price/', search_gear_by_rental_price_view, name='filter-by-gear-price'),
     path('filter-by-size/', search_gear_by_size_view, name='filter-by-size'),
