@@ -27,6 +27,9 @@ urlpatterns = [
     path('api/motorized-vehicles/<str:vin>/',ViewMaintenanceRecords.as_view(), name = 'view-maintenance-records'),
     path('api/storage-lots/', ViewAllStorageLots.as_view(), name='view-all-storage-lots'),
     path('api/gear-items/', ViewAllGearItems.as_view(), name='view-all-gear-items'),
+
+    #date details
+    path('api/reserved_dates_motorcycle/<str:vin>/', ReservedDatesView.as_view(), name='view-motorcycle-dates'),
     
     # Reservations for items
     path('api/add-reservation/', AddReservationView.as_view(), name='add-reservation'),

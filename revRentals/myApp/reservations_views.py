@@ -500,3 +500,26 @@ class CheckActiveLotRentalView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class ReservedDatesView(APIView):
+    def get(self, request, vin):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT Start_Date, End_Date
+                    FROM reservation
+                    WHERE VIN = %s AND Status IN ('Pending Approval', 'Paid');
+                """, [vin])
+                reservations = cursor.fetchall()
+
+            reserved_dates = [
+                {
+                    "start_date": res[0].strftime("%Y-%m-%d"),
+                    "end_date": res[1].strftime("%Y-%m-%d")
+                }
+                for res in reservations
+            ]
+
+            return Response({"success": True, "reserved_dates": reserved_dates}, status=200)
+        except Exception as e:
+            return Response({"success": False, "error": str(e)}, status=500)

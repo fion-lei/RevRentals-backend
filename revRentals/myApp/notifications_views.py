@@ -75,7 +75,7 @@ class UpdateReservationView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-#display to buyer notifications
+# display to buyer notifications
 class BuyerNotificationsView(APIView):
     def get(self, request, buyer_id):
         try:
@@ -116,7 +116,7 @@ class BuyerNotificationsView(APIView):
         except Exception as e:
             print(f"Error in BuyerNotificationsView: {e}")
             return Response({"success": False, "error": str(e)}, status=500)
-        
+      
 # delete a reservation upon user acknowledge of rejection
 class DeleteReservationView(APIView):
     def delete(self, request, reservation_no):
