@@ -187,7 +187,7 @@ class ViewAllGarageItemsView(APIView):
             with connection.cursor() as cursor:
                 # Fetch motorized vehicles
                 cursor.execute("""
-                    SELECT mv.VIN, mv.Registration, mv.Rental_Price, mv.Color, mv.Mileage, mv.Insurance, mv.Model
+                    SELECT mv.VIN, mv.Registration, mv.Rental_Price, mv.Color, mv.Mileage, mv.Insurance, mv.Model, mv.Vehicle_Type
                     FROM motorized_vehicle AS mv
                     WHERE mv.Garage_ID = %s
                 """, [garage_id])
@@ -211,6 +211,7 @@ class ViewAllGarageItemsView(APIView):
                     "Mileage": row[4],
                     "Insurance": row[5],
                     "Model": row[6],
+                    "Vehicle_Type": row[7],
                 }
                 for row in motorized_vehicles
             ]
