@@ -237,3 +237,39 @@ class ProfileDetailsView(APIView):
                 "success": False,
                 "error": str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+            
+    def get(self, request, profile_id):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT Profile_ID, Username, First_Name, Last_Name, Email, License, Address, OverallRating
+                    FROM profile 
+                    WHERE Profile_ID = %s
+                """, [profile_id])
+                user = cursor.fetchone()
+
+                if user:
+                    return Response({
+                        "success": True,
+                        "user": {
+                            "profile_id": user[0],
+                            "username": user[1],
+                            "first_name": user[2],
+                            "last_name": user[3],
+                            "email": user[4],
+                            "license": user[5],
+                            "address": user[6],
+                            "overall_rating": float(user[7]) if user[7] else None
+                        }
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "success": False,
+                        "error": "Profile not found"
+                    }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({
+                "success": False,
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
