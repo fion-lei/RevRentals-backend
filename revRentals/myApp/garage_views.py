@@ -22,7 +22,6 @@ class AddMotorizedVehicleView(APIView):
             model = data.get('model')
             vehicle_type = data.get('vehicle_type')
 
-            print("this is the color" + color)
             # Validate required fields
             if not all([vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type]):
                 return Response({'error': 'All fields, including vehicle_type, are required.'}, status=status.HTTP_400_BAD_REQUEST)
