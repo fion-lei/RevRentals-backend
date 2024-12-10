@@ -76,7 +76,9 @@ pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 ```
-4. Start the Django development server: ```python manage.py runserver``
+4. Start the Django development server: ```python manage.py runserver```
+
+---
 
 ### File Specifications and Locations: 
 ```
