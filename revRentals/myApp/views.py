@@ -16,7 +16,7 @@ class LoginView(APIView):
             # Query the database for the user
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT Profile_ID, First_Name, Last_Name, Email, License, Username, Password, Address, OverallRating
+                    SELECT Profile_ID, First_Name, Last_Name, Email, License, Username, Password, Address
                     FROM profile
                     WHERE Username = %s OR Email = %s
                 """, [username, username])
@@ -24,7 +24,7 @@ class LoginView(APIView):
 
             if user:
                 (profile_id, first_name, last_name, email, license, username,
-                 hashed_password, address, overall_rating) = user
+                 hashed_password, address) = user
 
                 # Validate the password
                 if check_password(password, hashed_password):
@@ -39,7 +39,6 @@ class LoginView(APIView):
                             "license": license,
                             "username": username,
                             "address": address,
-                            "overall_rating": float(overall_rating) if overall_rating else None,
                         }
                     }, status=status.HTTP_200_OK)
                 else:
@@ -85,7 +84,7 @@ class RegisterView(APIView):
             with connection.cursor() as cursor:
                 print("start")
                 cursor.execute("""
-                    INSERT INTO profile (First_Name, Last_Name, Email, License, Username, Password, Address, OverallRating)
+                    INSERT INTO profile (First_Name, Last_Name, Email, License, Username, Password, Address)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """, [None, None, email, None, username, hashed_password, None, None])
                 profile_id = cursor.lastrowid # Get the newly generated Profile_ID
@@ -208,7 +207,7 @@ class ProfileDetailsView(APIView):
 
                 # Fetch updated data
                 cursor.execute("""
-                    SELECT Profile_ID, Username, First_Name, Last_Name, Email, License, Address, OverallRating
+                    SELECT Profile_ID, Username, First_Name, Last_Name, Email, License, Address
                     FROM profile 
                     WHERE Profile_ID = %s
                 """, [profile_id])
@@ -227,7 +226,6 @@ class ProfileDetailsView(APIView):
                             "email": user[4],
                             "license": user[5],
                             "address": user[6],
-                            "overall_rating": float(user[7]) if user[7] else None
                         }
                     }, status=status.HTTP_200_OK)
 
@@ -242,7 +240,7 @@ class ProfileDetailsView(APIView):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT Profile_ID, Username, First_Name, Last_Name, Email, License, Address, OverallRating
+                    SELECT Profile_ID, Username, First_Name, Last_Name, Email, License, Address
                     FROM profile 
                     WHERE Profile_ID = %s
                 """, [profile_id])
@@ -259,7 +257,6 @@ class ProfileDetailsView(APIView):
                             "email": user[4],
                             "license": user[5],
                             "address": user[6],
-                            "overall_rating": float(user[7]) if user[7] else None
                         }
                     }, status=status.HTTP_200_OK)
                 else:
