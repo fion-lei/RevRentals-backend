@@ -76,4 +76,43 @@ pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 ```
-4. Start the Django development server: ```python manage.py runserver```
+4. Start the Django development server: ```python manage.py runserver``
+
+### File Specifications and Locations: 
+
+RevRentals/
+├── RevRentals-backend/
+├── ├── .venv/                                   # Virtual environment (dependencies and Python environment)
+├── ├── revRentals/                              # Django project folder
+├── │   ├── __pycache__/                         # Compiled Python files
+├── │   ├── __init__.py                          # Marks this as a Python package
+├── │   ├── asgi.py                              # ASGI configuration
+├── │   ├── DigiCertGlobalRootCA.crt.pem         # SSL certificate file
+├── │   ├── settings.py                          # Project settings (database, installed apps, etc.)
+├── │   ├── urls.py                              # Root URL configuration
+├── │   ├── wsgi.py                              # WSGI configuration for deployment
+├── ├── myApp/                                   # Django app for business logic
+├── │   ├── __pycache__/                         # Compiled Python files
+├── │   ├── migrations/                          # Database migrations
+├── │   │   ├── __init__.py                      # Marks migrations as a Python package
+├── │   ├── admin.py                             # Django admin configurations
+├── │   ├── apps.py                              # App-specific configurations
+├── │   ├── garage_views.py                      # Views related to garages
+├── │   ├── gear_views.py                        # Views related to gear
+├── │   ├── notifications_views.py               # Views related to notifications
+├── │   ├── reservations_views.py                # Views related to reservations
+├── │   ├── storage_lot_views.py                 # Views related to storage lots
+├── │   ├── vehicle_views.py                     # Views related to vehicles
+├── │   ├── models.py                            # Database models for the app
+├── │   ├── urls.py                              # App-specific URL routing
+├── │   ├── views.py                             # Generic or other views
+├── ├── db.sqlite3                               # SQLite database file
+├── ├── manage.py                                # Django management script
+├── ├── test_views.py                            # Unit tests for views
+├── ├── .env                                     # Environment variables (database credentials, secrets, etc.)
+├── ├── .gitignore                               # Files and directories to ignore in version control
+├── ├── README.md                                # Backend-specific documentation
+├── ├── requirements.txt                         # Python dependencies
+├── RevRentals/                                  # Frontend files
+├── README.md                                    # Project documentation
+└── .gitignore                                   # Git ignore rules
