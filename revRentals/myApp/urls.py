@@ -55,7 +55,6 @@ urlpatterns = [
     path('api/admin-login/', AdminLoginView.as_view(), name='admin-login'),
     path('api/get-admin-id/', GetAdminIDView.as_view(), name='get-admin-id'),
     # Agreements, Reservations, Transactions
-    path('api/agreements/', ViewAllAgreements.as_view(), name ='view-agreements'),
     path('api/reservations/', ViewAllReservations.as_view(), name ='view-reservations'),
     path('api/get-transaction/<int:reservation_no>/', GetTransactionView.as_view(), name = 'get-transaction' ),
 
