@@ -281,11 +281,31 @@ class AddAgreementView(APIView):
                 agreement_fee = rental_price * rental_days
                 rental_overview = f"{item_type} rental for {rental_days} days: {start_date} to {end_date}"
 
-                # Set a fixed damage compensation
+                # Set damage compensation based on insurance type
                 if lot_no:
                     damage_compensation = 0
                 else:
-                    damage_compensation = 200
+                    # Get insurance type for motorized vehicle or gear
+                    if vin:
+                        cursor.execute("""
+                            SELECT Insurance
+                            FROM motorized_vehicle
+                            WHERE VIN = %s
+                        """, [vin])
+                        insurance_type = cursor.fetchone()[0]
+                    else:
+                        # For gear, we'll use basic insurance
+                        insurance_type = 'Basic'
+                        
+                    # Set damage compensation based on insurance type
+                    if insurance_type == 'Basic':
+                        damage_compensation = 100
+                    elif insurance_type == 'Premium':
+                        damage_compensation = 300
+                    elif insurance_type == 'Comprehensive':
+                        damage_compensation = 200
+                    else:
+                        damage_compensation = 100  # Default to basic if unknown insurance type
 
                 # Insert into agreement table
                 cursor.execute("""
