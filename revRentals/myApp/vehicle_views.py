@@ -131,6 +131,36 @@ class SearchByMultipleConditionsView(APIView):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
+class GetVehiclesView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            # Query to fetch all vehicles
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM motorized_vehicle"
+                )
+                rows = cursor.fetchall()
+
+            # Convert rows to a list of dictionaries
+            vehicles = [
+                {
+                    "VIN": row[0],
+                    "Garage_ID": row[1],
+                    "Registration": row[2],
+                    "Rental_Price": row[3],
+                    "Color": row[4],
+                    "Mileage": row[5],
+                    "Insurance": row[6],
+                    "Model": row[7],
+                    "Vehicle_Type": row[8]
+                }
+                for row in rows
+            ]
+
+            return JsonResponse({"vehicles": vehicles}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
         
 class GetVIN(APIView):
     def get(self, request):

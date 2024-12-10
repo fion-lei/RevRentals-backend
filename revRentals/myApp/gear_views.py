@@ -9,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
-
 class SearchGearByMultipleConditionsView(APIView):
     # Search gear items with multiple filtering conditions
     def get(self, request, *args, **kwargs):
@@ -71,5 +70,31 @@ class SearchGearByMultipleConditionsView(APIView):
 
             return JsonResponse({"gear": gear}, status=200)
 
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+class GetAllGearView(APIView):
+    # Retrieve all gear
+    def get(self, request, *args, **kwargs):
+        try:
+            # Query to fetch all gear
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM gear")
+                rows = cursor.fetchall()
+
+            gear = [
+                {
+                    "Product_No": row[0],
+                    "Garage_ID": row[1],
+                    "Brand": row[2],
+                    "Material": row[3],
+                    "Type": row[4],
+                    "Size": row[5],
+                    "GRental_Price": row[6],
+                }
+                for row in rows
+            ]
+
+            return JsonResponse({"gear": gear}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)

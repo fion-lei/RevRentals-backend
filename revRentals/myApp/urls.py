@@ -71,10 +71,11 @@ urlpatterns = [
     path('api/notifications/delete/<int:reservation_no>/', DeleteReservationView.as_view(), name='delete-reservation'),
     path('api/notifications/check/<int:profile_id>/', CheckNotificationsView.as_view(), name='check-notifications'),
     
-    # Marketplace
+    # Vehicle filtering
     path('filter-by-multiple-conditions/', SearchByMultipleConditionsView.as_view(), name='filter-by-multiple-conditions'),
-
-    #Gear
-    path('filter-gear-by-multiple-conditions/', SearchGearByMultipleConditionsView.as_view(), name='filter-gear-by-multiple-conditions'),
+    path('get-all-vehicles/', GetVehiclesView.as_view(), name='get-all-gear'),    
     
+    # Gear filtering
+    path('filter-gear-by-multiple-conditions/', SearchGearByMultipleConditionsView.as_view(), name='filter-gear-by-multiple-conditions'),
+    path('get-all-gear/', GetAllGearView.as_view(), name='get-all-gear'),
 ]
