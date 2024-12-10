@@ -85,8 +85,8 @@ class RegisterView(APIView):
                 print("start")
                 cursor.execute("""
                     INSERT INTO profile (First_Name, Last_Name, Email, License, Username, Password, Address)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """, [None, None, email, None, username, hashed_password, None, None])
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, [None, None, email, None, username, hashed_password, None])
                 profile_id = cursor.lastrowid # Get the newly generated Profile_ID
             print("Profile created with ID:", profile_id)  # Debugging log
 
