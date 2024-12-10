@@ -31,3 +31,29 @@ class ViewAllStorageLots(APIView):
             return Response({"storage_lots": storage_lots_data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetLotsView(APIView):
+    def get(self, request, *args, **kwargs):
+        print("get lots called")
+        try:
+            # Query to fetch all lots
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM storage_lot"
+                )
+                rows = cursor.fetchall()
+
+            # Convert rows to a list of dictionaries
+            vehicles = [
+                {
+                    "Lot_No": row[0],
+                    "LAddress": row[1],
+                    "Admin_ID": row[2],
+                    "LRentalPrice": float(row[3]) if row[3] is not None else 0.0,
+                }
+                for row in rows
+            ]
+
+            return JsonResponse({"vehicles": vehicles}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
