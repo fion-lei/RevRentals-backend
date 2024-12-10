@@ -37,7 +37,7 @@ class SearchGearByMultipleConditionsView(APIView):
                 conditions.append("size = %s")
                 params.append(size)
             if max_price != "Any":
-                conditions.append("GRentalPrice < %s")
+                conditions.append("GRentalPrice <= %s")
                 params.append(max_price)
 
             if conditions:

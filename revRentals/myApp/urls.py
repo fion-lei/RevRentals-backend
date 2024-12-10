@@ -63,6 +63,7 @@ urlpatterns = [
     path('api/add-lot-listing/',AddLotListing.as_view(), name = 'add-lot-listing'),
     path('api/edit-lot-listing/<int:lot_no>/',EditLotListing.as_view(), name = 'edit-lot-listing'),
     path('api/lot-rental/check/<int:profile_id>/', CheckActiveLotRentalView.as_view(), name='check-active-lot-rental'),
+    path('get-all-lots/', GetLotsView.as_view(), name='get-all-lots'), # for sorting
 
     # notifications / reservations
     path('api/notifications/seller/<int:seller_id>/', SellerNotificationsView.as_view(), name='seller-notifications'),
@@ -73,7 +74,7 @@ urlpatterns = [
     
     # Vehicle filtering
     path('filter-by-multiple-conditions/', SearchByMultipleConditionsView.as_view(), name='filter-by-multiple-conditions'),
-    path('get-all-vehicles/', GetVehiclesView.as_view(), name='get-all-gear'),    
+    path('get-all-vehicles/', GetVehiclesView.as_view(), name='get-all-vehicles'),    
     
     # Gear filtering
     path('filter-gear-by-multiple-conditions/', SearchGearByMultipleConditionsView.as_view(), name='filter-gear-by-multiple-conditions'),
