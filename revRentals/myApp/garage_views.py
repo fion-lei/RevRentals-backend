@@ -305,6 +305,13 @@ class AddMaintenanceRecordsView(APIView):
                     {"error": "No maintenance records provided."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+            for record in data:
+                date_str = record.get("date")
+                if not date_str:
+                    return Response(
+                        {"error": "Date is required for all maintenance records."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
             with connection.cursor() as cursor:
                 cursor.executemany("""
                     INSERT INTO maintenance_record(VIN, DATE, SERVICED_BY, SERVICE_DETAILS)
