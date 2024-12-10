@@ -79,7 +79,7 @@ python manage.py migrate
 4. Start the Django development server: ```python manage.py runserver``
 
 ### File Specifications and Locations: 
-
+```
 RevRentals/
 ├── RevRentals-backend/
 ├── ├── .venv/                                   # Virtual environment (dependencies and Python environment)
@@ -116,3 +116,4 @@ RevRentals/
 ├── RevRentals/                                  # Frontend files
 ├── README.md                                    # Project documentation
 └── .gitignore                                   # Git ignore rules
+```
