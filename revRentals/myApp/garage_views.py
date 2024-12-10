@@ -21,9 +21,11 @@ class AddMotorizedVehicleView(APIView):
             insurance = data.get('insurance')
             model = data.get('model')
             vehicle_type = data.get('vehicle_type')
+            specific_attribute = data.get('specific_attribute')
+            print(vehicle_type)
 
             # Validate required fields
-            if not all([vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type]):
+            if not all([vin, garage_id, registration, rental_price, color, mileage, insurance, model, vehicle_type, specific_attribute]):
                 return Response({'error': 'All fields, including vehicle_type, are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Check the number of motorized vehicles in the garage
@@ -51,7 +53,8 @@ class AddMotorizedVehicleView(APIView):
 
                 # Insert into the corresponding child table
                 if vehicle_type.lower() == 'motorcycle':
-                    engine_type = data.get('engine_type', None)
+                    engine_type = data.get('specific_attribute', None)
+                    print(engine_type)
                     cursor.execute(
                         """
                         INSERT INTO motorcycle (VIN, Engine_Type)
@@ -60,7 +63,8 @@ class AddMotorizedVehicleView(APIView):
                         [vin, engine_type]
                     )
                 elif vehicle_type.lower() == 'moped':
-                    cargo_rack = data.get('cargo_rack', None)
+                    cargo_rack = data.get('specific_attribute', None)
+                    print(cargo_rack)
                     cursor.execute(
                         """
                         INSERT INTO moped (VIN, Cargo_Rack)
@@ -69,10 +73,11 @@ class AddMotorizedVehicleView(APIView):
                         [vin, cargo_rack]
                     )
                 elif vehicle_type.lower() == 'dirtbike':
-                    dirt_bike_type = data.get('dirt_bike_type', None)
+                    dirt_bike_type = data.get('specific_attribute', None)
+                    print(dirt_bike_type)
                     cursor.execute(
                         """
-                        INSERT INTO dirt_bike (VIN, Dirt_Bike_Type)
+                        INSERT INTO dirtbike (VIN, Dirt_Bike_Type)
                         VALUES (%s, %s)
                         """,
                         [vin, dirt_bike_type]
