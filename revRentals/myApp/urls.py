@@ -72,21 +72,9 @@ urlpatterns = [
     path('api/notifications/check/<int:profile_id>/', CheckNotificationsView.as_view(), name='check-notifications'),
     
     # Marketplace
-    path('filter-by-color/', search_by_color_view, name='filter_by_color'),
-    path('filter-by-price/', search_by_rental_price_view, name='filter_by_price'),
-    path('filter-by-mileage/', search_by_mileage_view, name='filter_by_mileage'),
-    path('filter-by-insurance/', search_by_insurance_view, name='filter_by_insurance'),
-    path('filter-by-vehicle/', search_by_vehicle_view, name='filter_by_insurance'),
-    path('filter-by-multiple-conditions/', search_by_multiple_conditions_view, name='filter_by_multiple_conditions'),
-    path('get-all-vehicles/', get_vehicles_view, name='get-all-vehicles'),
-
+    path('filter-by-multiple-conditions/', SearchByMultipleConditionsView.as_view(), name='filter-by-multiple-conditions'),
 
     #Gear
-    path('get-all-gear/', get_all_gear_view, name='get-all-gear'),
-    path('filter-by-gear/', search_gear_by_type_view, name='filter-by-gear'),
-    path('filter-by-gear-price/', search_gear_by_rental_price_view, name='filter-by-gear-price'),
-    path('filter-by-size/', search_gear_by_size_view, name='filter-by-size'),
-    path('filter-by-material/', search_gear_by_material_view, name='filter-by-material'),
-    path('filter-by-brand/', search_gear_by_brand_view, name='filter-by-brand'),
-    path('filter-gear-by-multiple-conditions/', search_gear_by_multiple_conditions_view, name='filter-gear-by-multiple-conditions'),
+    path('filter-gear-by-multiple-conditions/', SearchGearByMultipleConditionsView.as_view(), name='filter-gear-by-multiple-conditions'),
+    
 ]

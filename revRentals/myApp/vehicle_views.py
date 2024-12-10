@@ -9,443 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
-
-# Get all motorized vehicles
-@csrf_exempt
-def get_vehicles_view(request):
-    if request.method == "GET":
-        try:
-            # Query to fetch all vehicles
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT * FROM motorized_vehicle"
-                )
-                rows = cursor.fetchall()
-                
-            # Convert rows to a list of dictionaries
-            vehicles = [
-                {
-                    "VIN": row[0],
-                    "Garage_ID": row[1],
-                    "Registration": row[2],
-                    "Rental_Price": row[3],
-                    "Color": row[4],
-                    "Mileage": row[5],
-                    "Insurance": row[6],
-                    "Model": row[7],
-                    "Vehicle_Type": row[8]
-                }
-                for row in rows
-            ]
-            return JsonResponse({"vehicles": vehicles}, status=201)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for motorcycles by engine type
-@csrf_exempt
-def search_by_engine_view(request):
-    if request.method == "GET":
-        try:
-            # Parse JSON request body
-            data = json.loads(request.body)
-            engine_type = data.get('engine_type')
-
-            # Validate input
-            if not engine_type:
-                return JsonResponse({'error': 'Engine type is required.'}, status=400)
-
-            # Query to fetch motorcycle by engine type
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT *
-                    FROM motorized_vehicle NATURAL JOIN motorcycle
-                    WHERE engine_type = %s
-                    """,
-                    [engine_type]
-                )
-                rows = cursor.fetchall()
-
-            # if you want to see all details
-            # # Convert rows to a list of dictionaries
-            motorcycles = [
-                 {
-                     "VIN": row[0],
-                     "Garage_ID": row[1],
-                     "Registration": row[2],
-                     "Rental_Price": row[3],
-                     "Color": row[4],
-                     "Mileage": row[5],
-                     "Insurance": row[6],
-                     "Model": row[7],
-                     "Engine_Type": row[8]
-                 }
-                 for row in rows
-             ]
-            return JsonResponse({"motorcycles": motorcycles}, status=201)
-            
-            # Extract VINs from rows
-            vins = [row[0] for row in rows]
-            
-            return JsonResponse({"vins": vins}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for mopeds by cargo rack
-@csrf_exempt
-def search_by_cargo_view(request):
-    if request.method == "POST":
-        try:
-            # Parse JSON request body
-            data = json.loads(request.body)
-            cargo_rack = data.get('cargo_rack')
-
-            # Validate input
-            if not cargo_rack:
-                return JsonResponse({'error': 'Cargo selection is required.'}, status=400)
-
-            # Query to fetch motorcycle by engine type
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT *
-                    FROM motorized_vehicle NATURAL JOIN moped
-                    WHERE cargo_rack = %s
-                    """,
-                    [cargo_rack]
-                )
-                rows = cursor.fetchall()
-                
-            # if you want to see all details
-            # # Convert rows to a list of dictionaries
-            # mopeds = [
-            #     {
-            #         "VIN": row[0],
-            #         "Garage_ID": row[1],
-            #         "Registration": row[2],
-            #         "Rental_Price": row[3],
-            #         "Color": row[4],
-            #         "Mileage": row[5],
-            #         "Insurance": row[6],
-            #         "Model": row[7],
-            #         "Cargo_Rack": row[8]
-            #     }
-            #     for row in rows
-            # ]
-            # return JsonResponse({"mopeds": mopeds}, status=201)
-            
-            # Extract VINs from rows
-            vins = [row[0] for row in rows]
-            
-            return JsonResponse({"vins": vins}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for dirtbikes by dirt bike type
-@csrf_exempt
-def search_by_dirtbike_type_view(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            dirt_bike_type = data.get('dirt_bike_type')
-
-            if not dirt_bike_type:
-                return JsonResponse({'error': 'Dirt Bike Type is required.'}, status=400)
-
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT *
-                    FROM motorized_vehicle NATURAL JOIN dirtbike
-                    WHERE dirt_bike_type = %s
-                    """,
-                    [dirt_bike_type]
-                )
-                rows = cursor.fetchall()
-
-            # if you want to see all details
-            # dirtbikes = [
-            #     {
-            #         "VIN": row[0],
-            #         "Garage_ID": row[1],
-            #         "Registration": row[2],
-            #         "Rental_Price": row[3],
-            #         "Color": row[4],
-            #         "Mileage": row[5],
-            #         "Insurance": row[6],
-            #         "Model": row[7],
-            #         "Dirt_Bike_Type": row[8]
-            #     }
-            #     for row in rows
-            # ]
-            # return JsonResponse({"dirtbikes": dirtbikes}, status=201)
-            
-            # Extract VINs from rows
-            vins = [row[0] for row in rows]
-            
-            return JsonResponse({"vins": vins}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for motorized vehicles by vehicle type first
-@csrf_exempt
-def search_by_vehicle_view(request):
-    if request.method == "POST":
-        print("Received POST request")
-        try:
-            data = json.loads(request.body)
-            vehicle = data.get('vehicle')
-
-           # if not color:
-           #     return JsonResponse({'error': 'Color is required.'}, status=400)
-            if vehicle:
-
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT *
-                        FROM motorized_vehicle
-                        WHERE Vehicle_Type = %s
-                        """,
-                        [vehicle]
-                    )
-                    rows = cursor.fetchall()
-            else:
-                 with connection.cursor() as cursor:
-                    cursor.execute("SELECT * FROM motorized_vehicle")
-                    rows = cursor.fetchall()
-
-            # if you want to see all details
-            vehicles = [
-                 {
-                     "VIN": row[0],
-                     "Garage_ID": row[1],
-                     "Registration": row[2],
-                     "Rental_Price": row[3],
-                     "Color": row[4],
-                     "Mileage": row[5],
-                     "Insurance": row[6],
-                     "Model": row[7]
-                 }
-                 for row in rows
-             ]
-            # return JsonResponse({"vehicles": vehicles}, status=201)
-            
-            # Extract VINs from rows
-            #vins = [row[0] for row in rows]
-
-            print(f"Filtered vehicles: {vehicles}") #debugging
-            
-            return JsonResponse({"vehicles": vehicles}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for motorized vehicles by color
-@csrf_exempt
-def search_by_color_view(request):
-    if request.method == "POST":
-        print("Received POST request")
-        try:
-            data = json.loads(request.body)
-            color = data.get('color')
-
-           # if not color:
-           #     return JsonResponse({'error': 'Color is required.'}, status=400)
-            if color:
-
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT *
-                        FROM motorized_vehicle
-                        WHERE color = %s
-                        """,
-                        [color]
-                    )
-                    rows = cursor.fetchall()
-            else:
-                 with connection.cursor() as cursor:
-                    cursor.execute("SELECT * FROM motorized_vehicle")
-                    rows = cursor.fetchall()
-
-            # if you want to see all details
-            vehicles = [
-                 {
-                     "VIN": row[0],
-                     "Garage_ID": row[1],
-                     "Registration": row[2],
-                     "Rental_Price": row[3],
-                     "Color": row[4],
-                     "Mileage": row[5],
-                     "Insurance": row[6],
-                     "Model": row[7]
-                 }
-                 for row in rows
-             ]
-            # return JsonResponse({"vehicles": vehicles}, status=201)
-            
-            # Extract VINs from rows
-            #vins = [row[0] for row in rows]
-
-            print(f"Filtered vehicles: {vehicles}") #debugging
-            
-            return JsonResponse({"vehicles": vehicles}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for insurance type
-@csrf_exempt
-def search_by_insurance_view(request):
-    if request.method == "POST":
-        print("Received POST request")
-        try:
-            data = json.loads(request.body)
-            insurance = data.get('insurance')
-
-           # if not color:
-           #     return JsonResponse({'error': 'Color is required.'}, status=400)
-            if insurance:
-
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        SELECT *
-                        FROM motorized_vehicle
-                        WHERE insurance = %s
-                        """,
-                        [insurance]
-                    )
-                    rows = cursor.fetchall()
-            else:
-                 with connection.cursor() as cursor:
-                    cursor.execute("SELECT * FROM motorized_vehicle")
-                    rows = cursor.fetchall()
-
-            # if you want to see all details
-            vehicles = [
-                 {
-                     "VIN": row[0],
-                     "Garage_ID": row[1],
-                     "Registration": row[2],
-                     "Rental_Price": row[3],
-                     "Color": row[4],
-                     "Mileage": row[5],
-                     "Insurance": row[6],
-                     "Model": row[7]
-                 }
-                 for row in rows
-             ]
-            # return JsonResponse({"vehicles": vehicles}, status=201)
-            
-            # Extract VINs from rows
-            #vins = [row[0] for row in rows]
-
-            print(f"Filtered vehicles: {vehicles}") #debugging
-            
-            return JsonResponse({"vehicles": vehicles}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-
-# Search for motorized vehicles by rental price
-@csrf_exempt
-def search_by_rental_price_view(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            max_price = data.get('rental_price')
-
-            if not max_price:
-                return JsonResponse({'error': 'Maximum rental price is required.'}, status=400)
-
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT *
-                    FROM motorized_vehicle
-                    WHERE rental_price < %s 
-                    """,
-                    [max_price]
-                )
-                rows = cursor.fetchall()
-
-            # if you want to see all details
-            vehicles = [
-                 {
-                     "VIN": row[0],
-                     "Garage_ID": row[1],
-                     "Registration": row[2],
-                     "Rental_Price": row[3],
-                     "Color": row[4],
-                     "Mileage": row[5],
-                     "Insurance": row[6],
-                     "Model": row[7]
-                 }
-                 for row in rows
-             ]
-            # return JsonResponse({"vehicles": vehicles}, status=201)
-            
-            # Extract VINs from rows
-            #vins = [row[0] for row in rows]
-
-            print(f"Filtered vehicles: {vehicles}") #debugging
-            
-            return JsonResponse({"vehicles": vehicles}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for motorized vehicles by mileage
-@csrf_exempt
-def search_by_mileage_view(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            max_mileage = data.get('mileage')
-
-            if not max_mileage:
-                return JsonResponse({'error': 'Maximum mileage is required.'}, status=400)
-
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT *
-                    FROM motorized_vehicle
-                    WHERE mileage < %s
-                    """,
-                    [max_mileage]
-                )
-                rows = cursor.fetchall()
-
-            # if you want to see all details
-            vehicles = [
-                 {
-                     "VIN": row[0],
-                     "Garage_ID": row[1],
-                     "Registration": row[2],
-                     "Rental_Price": row[3],
-                     "Color": row[4],
-                     "Mileage": row[5],
-                     "Insurance": row[6],
-                     "Model": row[7]
-                 }
-                 for row in rows
-             ]
-            # return JsonResponse({"vehicles": vehicles}, status=201)
-            
-            # Extract VINs from rows
-            #vins = [row[0] for row in rows]
-
-            print(f"Filtered vehicles: {vehicles}") #debugging
-            
-            return JsonResponse({"vehicles": vehicles}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-# Search for motorized vehicles by multiple conditions
-@csrf_exempt
-def search_by_multiple_conditions_view(request):
-    print("Filtering multiple conditions")
-    if request.method == "GET":
+class SearchByMultipleConditionsView(APIView):
+    def get(self, request, *args, **kwargs):
         try:
             # Extract search parameters
             mileage = request.GET.get('mileage', "Any")
@@ -457,18 +22,17 @@ def search_by_multiple_conditions_view(request):
             dirt_bike_type = request.GET.get('dirt_bike_type', "Any")
             vehicle_type = request.GET.get('vehicle', "All")
 
-            #For debugging
-            print("Mileage: ", mileage, 
-                  "Rental price: ", rental_price,
-                  "Color: ", color,
-                  "Insurance: ", insurance,
-                  "Engine type ", engine_type,
-                  "Cargo Rack ", cargo_rack,
-                  "Dirt: ", dirt_bike_type,
-                  "Vehicle: ", vehicle_type)
-            
-            print("Request Data: ", request.GET)
-            
+            # Debugging logs
+            print("Mileage:", mileage,
+                  "Rental price:", rental_price,
+                  "Color:", color,
+                  "Insurance:", insurance,
+                  "Engine type:", engine_type,
+                  "Cargo Rack:", cargo_rack,
+                  "Dirt Bike Type:", dirt_bike_type,
+                  "Vehicle Type:", vehicle_type)
+            print("Request Data:", request.GET)
+
             # Base query
             query = """
                 SELECT DISTINCT
@@ -496,7 +60,7 @@ def search_by_multiple_conditions_view(request):
                 LEFT JOIN 
                     maintenance_record AS MR ON MV.VIN = MR.VIN
             """
-            
+
             # Dynamically build WHERE clause
             conditions = []
             params = []
@@ -510,7 +74,7 @@ def search_by_multiple_conditions_view(request):
             if engine_type != "Any":
                 conditions.append("M.Engine_Type = %s")
                 params.append(engine_type)
-            if cargo_rack != "Any":  # Boolean for mopeds
+            if cargo_rack != "Any":
                 conditions.append("Mo.Cargo_Rack = %s")
                 params.append(cargo_rack)
             if dirt_bike_type != "Any":
@@ -523,91 +87,50 @@ def search_by_multiple_conditions_view(request):
                 conditions.append("MV.Vehicle_Type = %s")
                 params.append(vehicle_type)
             if color == "Other":
-                allowed_colors = ['Red',
-                                'Orange',
-                                'Yellow',
-                                'Green',
-                                'Blue',
-                                'Purple',
-                                'Pink',
-                                'Black',
-                                'White',] # these are all colors on front-end dropdown menu
+                allowed_colors = [
+                    'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Black', 'White'
+                ]
                 conditions.append("MV.Color NOT IN ({})".format(", ".join(["%s"] * len(allowed_colors))))
                 params.extend(allowed_colors)
             elif color != "Any":
                 conditions.append("MV.Color = %s")
                 params.append(color)
 
-
             if conditions:
                 query += " WHERE " + " AND ".join(conditions)
 
-            # checking log
-            print("Executing params:", params)
 
             # Execute query
             with connection.cursor() as cursor:
                 cursor.execute(query, params)
                 rows = cursor.fetchall()
 
-            # # Process results, if you want to see all details
+            # Process results
             vehicles = [
                 {
-                     "VIN": row[0],
-                     "Garage_ID": row[1],
-                     "Registration": row[2],
-                     "Rental_Price": row[3],
-                     "Color": row[4],
-                     "Mileage": row[5],
-                     "Insurance": row[6],
-                     "Model": row[7],
-                     "Vehicle Type": row[8],
-                     "Engine_Type": row[9],
-                     "Cargo_Rack": row[10] if len(row) > 10 else None,
-                     "Dirt_Bike_Type": row[11] if len(row) > 11 else None,
-                 }
-                 for row in rows
-             ]
-            # return JsonResponse({"vehicles": vehicles}, status=200)
-            # Extract VINs from rows
-            
-            #vins = [row[0] for row in rows]
-            print(f"Filtered vehicles: {vehicles}") #debugging
-            
+                    "VIN": row[0],
+                    "Garage_ID": row[1],
+                    "Registration": row[2],
+                    "Rental_Price": row[3],
+                    "Color": row[4],
+                    "Mileage": row[5],
+                    "Insurance": row[6],
+                    "Model": row[7],
+                    "Vehicle Type": row[8],
+                    "Engine_Type": row[9],
+                    "Cargo_Rack": row[10] if len(row) > 10 else None,
+                    "Dirt_Bike_Type": row[11] if len(row) > 11 else None,
+                }
+                for row in rows
+            ]
+
+            #print(f"Filtered vehicles: {vehicles}")  # Debugging
+
             return JsonResponse({"vehicles": vehicles}, status=200)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
-    else:
-        return JsonResponse({"error": "Invalid HTTP method. Only GET is allowed."}, status=405)
 
-class SearchByColorView(APIView):
-    # Search for motorized vehicles by color
-    def post(self, request, *args, **kwargs):
-        try:
-            data = json.loads(request.body)
-            color = data.get('color')
-
-            if not color:
-                return JsonResponse({'error': 'Color is required.'}, status=400)
-
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT *
-                    FROM motorized_vehicle
-                    WHERE color = %s
-                    """,
-                    [color]
-                )
-                rows = cursor.fetchall()
-
-            vins = [row[0] for row in rows]
-
-            return JsonResponse({"vins": vins}, status=200)
-
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
         
 class GetVIN(APIView):
     def get(self, request):
